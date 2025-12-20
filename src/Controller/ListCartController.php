@@ -55,7 +55,7 @@ class ListCartController extends AbstractListController
             $filter['status'] = $status;
         }
         if ($autoDeduction && $autoDeduction != '-1') {
-            $filter['autoDeduction'] = $autoDeduction;
+            $filter['auto_deduction'] = $autoDeduction;
         }
 
         $list = StoreCartModel::query()
