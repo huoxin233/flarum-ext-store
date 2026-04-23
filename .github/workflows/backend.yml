@@ -1,10 +1,10 @@
-name: Flarum-ext-store PHP
+name: Flarum Store PHP
 
 on: [workflow_dispatch, push, pull_request]
 
 jobs:
   run:
-    uses: flarum/framework/.github/workflows/REUSABLE_backend.yml@main
+    uses: flarum/framework/.github/workflows/REUSABLE_backend.yml@1.x
     with:
       enable_backend_testing: true
 
