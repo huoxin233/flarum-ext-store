@@ -6,14 +6,17 @@ use Illuminate\Contracts\Filesystem\Factory;
 use Illuminate\Support\Str;
 use Psr\Http\Message\UploadedFileInterface;
 
-class StoreUploader{
+class StoreUploader
+{
     protected $uploadDir;
 
-    public function __construct(Factory $filesystemFactory){
+    public function __construct(Factory $filesystemFactory)
+    {
         $this->uploadDir = $filesystemFactory->disk('mattoid-store');
     }
 
-    public function upload(UploadedFileInterface $file) {
+    public function upload(UploadedFileInterface $file)
+    {
         $ext = pathinfo($file->getClientFilename(), PATHINFO_EXTENSION);
         $filename = time()."_".Str::random().'.'.$ext;
         $stream = $file->getStream();
@@ -32,7 +35,8 @@ class StoreUploader{
         return md5($stream->getContents());
     }
 
-    public function remove(string $filename){
+    public function remove(string $filename)
+    {
         $fullFilename = $filename;
 
         if ($this->uploadDir->exists($fullFilename)) {

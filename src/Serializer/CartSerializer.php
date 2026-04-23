@@ -9,7 +9,6 @@ use Mattoid\Store\Enum\LimitUnitEnum;
 
 class CartSerializer extends AbstractSerializer
 {
-
     protected $translator;
 
     public function __construct(Translator $translator)
@@ -17,7 +16,8 @@ class CartSerializer extends AbstractSerializer
         $this->translator = $translator;
     }
 
-    protected function getDefaultAttributes($data) {
+    protected function getDefaultAttributes($data)
+    {
         return [
             'id' => $data->id,
             'storeId' => $data->store_id,

@@ -16,7 +16,8 @@ class DataSerializer extends AbstractSerializer
         $this->translator = $translator;
     }
 
-    protected function getDefaultAttributes($data) {
+    protected function getDefaultAttributes($data)
+    {
         return $data;
     }
 }

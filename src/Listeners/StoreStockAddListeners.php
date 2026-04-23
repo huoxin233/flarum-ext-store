@@ -26,7 +26,8 @@ class StoreStockAddListeners
         $this->translator = $translator;
     }
 
-    public function handle(StoreStockAddEvent $event) {
+    public function handle(StoreStockAddEvent $event)
+    {
         $store = StoreModel::query()->where('id', $event->store->id)->first();
         if ($store->stock != -99) {
             $store->increment('stock');

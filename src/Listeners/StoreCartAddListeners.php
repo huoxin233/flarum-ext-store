@@ -17,7 +17,6 @@ use Mattoid\Store\Model\StoreCartModel;
  */
 class StoreCartAddListeners
 {
-
     private $events;
     private $settings;
     private $translator;
@@ -32,9 +31,11 @@ class StoreCartAddListeners
         $this->translator = $translator;
 
         $storeTimezone = $this->settings->get('mattoid-store.storeTimezone', 'Asia/Shanghai');
-        $this->storeTimezone = !!$storeTimezone ? $storeTimezone : 'Asia/Shanghai';    }
+        $this->storeTimezone = ! ! $storeTimezone ? $storeTimezone : 'Asia/Shanghai';
+    }
 
-    public function handle(StoreCartAddEvent $event) {
+    public function handle(StoreCartAddEvent $event)
+    {
         $actor = $event->user;
         $store = $event->store;
         $price = $event->price;

@@ -15,7 +15,6 @@ use Mattoid\Store\Model\StoreModel;
  */
 class StoreStockSubListeners
 {
-
     private $events;
     private $settings;
     private $translator;
@@ -28,7 +27,8 @@ class StoreStockSubListeners
         $this->translator = $translator;
     }
 
-    public function handle(StoreStockSubEvent $event) {
+    public function handle(StoreStockSubEvent $event)
+    {
         $store = StoreModel::query()->where('id', $event->store->id)->first();
 
         if ($store->stock != -99) {

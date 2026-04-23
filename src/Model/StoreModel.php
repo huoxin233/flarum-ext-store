@@ -7,7 +7,6 @@ use Flarum\Formatter\Formatter;
 
 class StoreModel extends AbstractModel
 {
-
     protected $table = "store";
 
     /**

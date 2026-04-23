@@ -7,7 +7,6 @@ use Flarum\Formatter\Formatter;
 
 class StoreCartModel extends AbstractModel
 {
-
     protected $table = "store_cart";
 
     /**

@@ -17,7 +17,6 @@ use Tobscure\JsonApi\Document;
 
 class ListCartController extends AbstractListController
 {
-
     protected $url;
     protected $translator;
     protected $repository;
@@ -34,7 +33,8 @@ class ListCartController extends AbstractListController
         $this->repository = $repository;
     }
 
-    protected function data(ServerRequestInterface $request, Document $document) {
+    protected function data(ServerRequestInterface $request, Document $document)
+    {
         $actor = RequestUtil::getActor($request);
         $params = $request->getQueryParams();
         $limit = $this->extractLimit($request);
@@ -44,7 +44,7 @@ class ListCartController extends AbstractListController
         $autoDeduction = Arr::get($params, 'filter.autoDeduction');
         $filter = [];
 
-        if (!$actor->can('mattoid-store.group-view')) {
+        if (! $actor->can('mattoid-store.group-view')) {
             throw new PermissionDeniedException();
         }
 
@@ -71,7 +71,7 @@ class ListCartController extends AbstractListController
         }
 
         $results = $limit > 0 && $list->count() > $limit;
-        if($results){
+        if ($results) {
             $list->pop();
         }
         $document->addPaginationLinks(

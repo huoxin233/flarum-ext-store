@@ -14,7 +14,8 @@ class GoodsSerializer extends AbstractSerializer
         $this->translator = $translator;
     }
 
-    protected function getDefaultAttributes($data) {
+    protected function getDefaultAttributes($data)
+    {
         return [
             'code' => $data->code,
             'name' => $this->translator->trans($data->name),

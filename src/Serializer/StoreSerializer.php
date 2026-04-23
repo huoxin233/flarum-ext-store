@@ -16,7 +16,8 @@ class StoreSerializer extends AbstractSerializer
         $this->translator = $translator;
     }
 
-    protected function getDefaultAttributes($data) {
+    protected function getDefaultAttributes($data)
+    {
         return [
             'id' => $data->id,
             'code' => $data->code,

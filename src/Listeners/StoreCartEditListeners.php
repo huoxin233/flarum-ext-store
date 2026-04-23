@@ -17,7 +17,6 @@ use Mattoid\Store\Model\StoreModel;
  */
 class StoreCartEditListeners
 {
-
     private $events;
     private $settings;
     private $translator;
@@ -30,7 +29,8 @@ class StoreCartEditListeners
         $this->translator = $translator;
     }
 
-    public function handle(StoreCartEditEvent $event) {
+    public function handle(StoreCartEditEvent $event)
+    {
         // 更新购物车状态
         // Update shopping cart status
         $cart = StoreCartModel::query()->where('id', $event->cart->id)->first();

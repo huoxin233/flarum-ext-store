@@ -1,17 +1,17 @@
 import app from 'flarum/admin/app';
-import Modal, {IInternalModalAttrs} from 'flarum/common/components/Modal';
+import Modal, { IInternalModalAttrs } from 'flarum/common/components/Modal';
 import Button from 'flarum/common/components/Button';
-import React from "react";
-import StoreGoodsDetailModal from "./StoreGoodsDetailModal";
+import React from 'react';
+import StoreGoodsDetailModal from './StoreGoodsDetailModal';
 
 export default class AddStoreGoods extends Modal {
-  private goodsList: any = []
-  private moreResults: boolean = false
+  private goodsList: any = [];
+  private moreResults: boolean = false;
 
   oninit(vnode) {
     super.oninit(vnode);
 
-    this.loadResults()
+    this.loadResults();
   }
 
   title() {
@@ -19,7 +19,7 @@ export default class AddStoreGoods extends Modal {
   }
 
   className(): string {
-    return "";
+    return '';
   }
 
   content() {
@@ -30,13 +30,15 @@ export default class AddStoreGoods extends Modal {
             <div className="ExtensionPage-body">
               <div className="ExtensionPage-settings FlarumBadgesPage" style="margin-top: 10px">
                 <div className="container">
-                  <span className="leftAligned" style="padding: 8px">{item.attributes.name}</span>
+                  <span className="leftAligned" style="padding: 8px">
+                    {item.attributes.name}
+                  </span>
                   <Button
                     className="Button rightAligned"
                     onclick={() => {
                       app.modal.show(StoreGoodsDetailModal, {
                         code: item.attributes.code,
-                        title: item.attributes.name
+                        title: item.attributes.name,
                       });
                     }}
                   >
@@ -50,15 +52,15 @@ export default class AddStoreGoods extends Modal {
 
         {!this.loading && this.goodsList.length === 0 && (
           <div>
-            <div
-              style="font-size:1.4em;color: var(--muted-more-color);text-align: center;line-height: 100px;">{app.translator.trans("mattoid-store.lib.list-empty")}</div>
+            <div style="font-size:1.4em;color: var(--muted-more-color);text-align: center;line-height: 100px;">
+              {app.translator.trans('mattoid-store.lib.list-empty')}
+            </div>
           </div>
         )}
 
         {!this.loading && this.hasMoreResults() && (
           <div style="text-align:center;padding:20px">
-            <Button className={'Button Button--primary'} disabled={this.loading} loading={this.loading}
-                    onclick={() => this.loadMore()}>
+            <Button className={'Button Button--primary'} disabled={this.loading} loading={this.loading} onclick={() => this.loadMore()}>
               {app.translator.trans('mattoid-store.lib.list-load-more')}
             </Button>
           </div>
@@ -67,17 +69,20 @@ export default class AddStoreGoods extends Modal {
         {this.loading && (
           <div class="DiscussionList">
             <div class="DiscussionList-loadMore">
-              <div aria-label="loading…" role="status" data-size="medium"
-                   class="LoadingIndicator-container LoadingIndicator-container--block LoadingIndicator-container--medium">
+              <div
+                aria-label="loading…"
+                role="status"
+                data-size="medium"
+                class="LoadingIndicator-container LoadingIndicator-container--block LoadingIndicator-container--medium"
+              >
                 <div aria-hidden="true" class="LoadingIndicator"></div>
               </div>
             </div>
           </div>
         )}
       </div>
-    )
+    );
   }
-
 
   hasMoreResults() {
     return this.moreResults;
@@ -99,12 +104,11 @@ export default class AddStoreGoods extends Modal {
 
   loadResults(offset = 0) {
     this.loading = true;
-    const filters = {
-    };
+    const filters = {};
 
     return app.store
-      .find("/store/goods", {
-        filter:filters,
+      .find('/store/goods', {
+        filter: filters,
         page: {
           offset,
         },
@@ -112,5 +116,4 @@ export default class AddStoreGoods extends Modal {
       .catch(() => {})
       .then(this.parseResults.bind(this));
   }
-
 }

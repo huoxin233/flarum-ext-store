@@ -18,7 +18,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class StoreExtend implements ExtenderInterface, LifecycleInterface
 {
-
     private $key = '';
     private static $goodList = [];
     private static $afterList = [];
@@ -39,7 +38,8 @@ class StoreExtend implements ExtenderInterface, LifecycleInterface
         $this->translator = resolve(TranslatorInterface::class);
 
         $storeTimezone = $this->settings->get('mattoid-store.storeTimezone', 'Asia/Shanghai');
-        $this->storeTimezone = !!$storeTimezone ? $storeTimezone : 'Asia/Shanghai';    }
+        $this->storeTimezone = ! ! $storeTimezone ? $storeTimezone : 'Asia/Shanghai';
+    }
 
     /**
      * 注册商品信息
@@ -105,7 +105,7 @@ class StoreExtend implements ExtenderInterface, LifecycleInterface
         return $this;
     }
 
-    public static function getStoreGoods(String $key)
+    public static function getStoreGoods(string $key)
     {
         if (array_key_exists($key, StoreExtend::$goodList)) {
             $class = StoreExtend::$goodList[$key];
@@ -114,7 +114,7 @@ class StoreExtend implements ExtenderInterface, LifecycleInterface
         return null;
     }
 
-    public static function getValidate(String $key)
+    public static function getValidate(string $key)
     {
         if (array_key_exists($key, StoreExtend::$validateList)) {
             $class = StoreExtend::$validateList[$key];
@@ -123,7 +123,7 @@ class StoreExtend implements ExtenderInterface, LifecycleInterface
         return null;
     }
 
-    public static function getAfter(String $key)
+    public static function getAfter(string $key)
     {
         if (array_key_exists($key, StoreExtend::$afterList)) {
             $class = StoreExtend::$afterList[$key];
@@ -141,7 +141,7 @@ class StoreExtend implements ExtenderInterface, LifecycleInterface
         return null;
     }
 
-    public static function getEnable(String $key)
+    public static function getEnable(string $key)
     {
         if (array_key_exists($key, StoreExtend::$enableList)) {
             $class = StoreExtend::$enableList[$key];

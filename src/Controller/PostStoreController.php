@@ -43,20 +43,21 @@ class PostStoreController extends AbstractCreateController
         $this->repository = $repository;
 
         $storeTimezone = $this->settings->get('mattoid-store.storeTimezone', 'Asia/Shanghai');
-        $this->storeTimezone = !!$storeTimezone ? $storeTimezone : 'Asia/Shanghai';
+        $this->storeTimezone = ! ! $storeTimezone ? $storeTimezone : 'Asia/Shanghai';
     }
 
-    protected function data(ServerRequestInterface $request, Document $document) {
+    protected function data(ServerRequestInterface $request, Document $document)
+    {
         $actor = RequestUtil::getActor($request);
         $parseBody = $request->getParsedBody();
         $params = [];
 
-        if (!$actor->can('mattoid-store.group-moderate')) {
+        if (! $actor->can('mattoid-store.group-moderate')) {
             throw new PermissionDeniedException();
         }
 
         $goods = StoreGoodsModel::query()->where('code', $parseBody['code'])->first();
-        if (!$goods) {
+        if (! $goods) {
             throw new ValidationException(['message' => $this->translator->trans('mattoid-store.admin.error.invalid-product')]);
         }
 
@@ -65,7 +66,7 @@ class PostStoreController extends AbstractCreateController
             $parseBody['stock'] = -99;
         }
         if (extension_loaded('bcmath')) {
-            $discountPrice = bcdiv(bcmul($parseBody['price'], $parseBody['discount']) ,100, 2);
+            $discountPrice = bcdiv(bcmul($parseBody['price'], $parseBody['discount']), 100, 2);
         } else {
             $discountPrice = round($parseBody['price'] * $parseBody['discount'] / 100, 2);
         }

@@ -37,7 +37,8 @@ class ListStoreController extends AbstractListController
         $this->repository = $repository;
     }
 
-    protected function data(ServerRequestInterface $request, Document $document) {
+    protected function data(ServerRequestInterface $request, Document $document)
+    {
         $filter = [];
         $actor = RequestUtil::getActor($request);
         $params = $request->getQueryParams();
@@ -46,7 +47,7 @@ class ListStoreController extends AbstractListController
         $type = Arr::get($params, 'filter.type');
         $status = Arr::get($params, 'filter.status');
 
-        if (!$actor->can('mattoid-store.group-view')) {
+        if (! $actor->can('mattoid-store.group-view')) {
             throw new PermissionDeniedException();
         }
 
@@ -65,7 +66,7 @@ class ListStoreController extends AbstractListController
             ->get();
 
         $results = $limit > 0 && $list->count() > $limit;
-        if($results){
+        if ($results) {
             $list->pop();
         }
         $document->addPaginationLinks(

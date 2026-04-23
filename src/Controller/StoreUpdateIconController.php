@@ -20,7 +20,8 @@ use Illuminate\Database\QueryException;
  * 上传图标
  * upload icon
  */
-class StoreUpdateIconController extends AbstractCreateController{
+class StoreUpdateIconController extends AbstractCreateController
+{
     public $serializer = DataSerializer::class;
     public $include = ['store'];
     protected $settings;
@@ -29,17 +30,19 @@ class StoreUpdateIconController extends AbstractCreateController{
     protected $translator;
     private $storeTimezone = 'Asia/Shanghai';
 
-    public function __construct(SettingsRepositoryInterface $settings, StoreUploader $uploader, StoreValidator $validator, Translator $translator){
+    public function __construct(SettingsRepositoryInterface $settings, StoreUploader $uploader, StoreValidator $validator, Translator $translator)
+    {
         $this->uploader = $uploader;
         $this->settings = $settings;
         $this->validator = $validator;
         $this->translator = $translator;
 
         $storeTimezone = $this->settings->get('mattoid-store.storeTimezone', 'Asia/Shanghai');
-        $this->storeTimezone = !!$storeTimezone ? $storeTimezone : 'Asia/Shanghai';
+        $this->storeTimezone = ! ! $storeTimezone ? $storeTimezone : 'Asia/Shanghai';
     }
 
-    protected function data(ServerRequestInterface $request, Document $document){
+    protected function data(ServerRequestInterface $request, Document $document)
+    {
         $result = [];
         $file = Arr::get($request->getUploadedFiles(), 'file');
 
@@ -55,7 +58,8 @@ class StoreUpdateIconController extends AbstractCreateController{
 
         $icon->increment('count');
 
-        $icon->url = $this->uploader->upload($file);;
+        $icon->url = $this->uploader->upload($file);
+        ;
         $icon->created_at = Carbon::now()->tz($this->storeTimezone);
         $icon->updated_at = Carbon::now()->tz($this->storeTimezone);
         $icon->save();

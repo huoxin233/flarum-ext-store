@@ -1,16 +1,15 @@
 import app from 'flarum/admin/app';
 import ExtensionPage from 'flarum/admin/components/ExtensionPage';
 import Button from 'flarum/common/components/Button';
-import  Mithril from 'mithril';
-import AddStoreGoods from "./AddStoreGoods";
-import Select from "flarum/common/components/Select";
+import Mithril from 'mithril';
+import AddStoreGoods from './AddStoreGoods';
+import Select from 'flarum/common/components/Select';
 import Stream from 'flarum/common/utils/Stream';
-import StoreListItem from "./StoreListItem";
+import StoreListItem from './StoreListItem';
 
 export default class StoreListPage extends ExtensionPage {
-
-  private storeList: any = []
-  private moreResults: boolean = false
+  private storeList: any = [];
+  private moreResults: boolean = false;
 
   oninit(vnode: Mithril.Vnode) {
     super.oninit(vnode);
@@ -43,14 +42,20 @@ export default class StoreListPage extends ExtensionPage {
               })}
               {this.submitButton()}
             </form>
-            <hr/>
+            <hr />
             {this.buildSettingComponent(function () {
-                return m('.Form-group', Button.component({
-                  className: 'Button',
-                  onclick() {
-                    app.modal.show(AddStoreGoods);
+              return m(
+                '.Form-group',
+                Button.component(
+                  {
+                    className: 'Button',
+                    onclick() {
+                      app.modal.show(AddStoreGoods);
+                    },
                   },
-                }, app.translator.trans('mattoid-store.admin.settings.add-store-goods')));
+                  app.translator.trans('mattoid-store.admin.settings.add-store-goods')
+                )
+              );
             })}
           </div>
           <div className="container">
@@ -62,13 +67,13 @@ export default class StoreListPage extends ExtensionPage {
                   options={{
                     '-1': app.translator.trans('mattoid-store.lib.item-status-all'),
                     '1': app.translator.trans('mattoid-store.lib.item-status-up'),
-                    '0': app.translator.trans('mattoid-store.lib.item-status-down')
+                    '0': app.translator.trans('mattoid-store.lib.item-status-down'),
                   }}
                   buttonClassName="Button"
                   onchange={(e) => {
-                    this.status(e)
-                    this.storeList = []
-                    this.loadResults()
+                    this.status(e);
+                    this.storeList = [];
+                    this.loadResults();
                   }}
                 />
               </div>
@@ -78,28 +83,22 @@ export default class StoreListPage extends ExtensionPage {
                   disabled={this.loading}
                   options={{
                     '-1': app.translator.trans('mattoid-store.lib.item-type-all'),
-                    'permanent': app.translator.trans('mattoid-store.lib.item-type-permanent'),
-                    'limit': app.translator.trans('mattoid-store.lib.item-type-limit'),
+                    permanent: app.translator.trans('mattoid-store.lib.item-type-permanent'),
+                    limit: app.translator.trans('mattoid-store.lib.item-type-limit'),
                   }}
                   buttonClassName="Button"
                   onchange={(e) => {
-                    this.type(e)
-                    this.storeList = []
-                    this.loadResults()
+                    this.type(e);
+                    this.storeList = [];
+                    this.loadResults();
                   }}
                 />
               </div>
             </div>
             <ul style="padding:0px;list-style-type: none;">
-              {
-                this.storeList.map((item) => {
-                  return (
-                    <li style="margin-top:5px;background: var(--body-bg);">
-                      {StoreListItem.component({ item })}
-                    </li>
-                  );
-                })
-              }
+              {this.storeList.map((item) => {
+                return <li style="margin-top:5px;background: var(--body-bg);">{StoreListItem.component({ item })}</li>;
+              })}
             </ul>
 
             {!this.loading && this.storeList.length === 0 && (
@@ -121,18 +120,21 @@ export default class StoreListPage extends ExtensionPage {
             {this.loading && (
               <div class="DiscussionList">
                 <div class="DiscussionList-loadMore">
-                  <div aria-label="loading…" role="status" data-size="medium"
-                       class="LoadingIndicator-container LoadingIndicator-container--block LoadingIndicator-container--medium">
+                  <div
+                    aria-label="loading…"
+                    role="status"
+                    data-size="medium"
+                    class="LoadingIndicator-container LoadingIndicator-container--block LoadingIndicator-container--medium"
+                  >
                     <div aria-hidden="true" class="LoadingIndicator"></div>
                   </div>
                 </div>
               </div>
             )}
-
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   hasMoreResults() {
@@ -157,12 +159,12 @@ export default class StoreListPage extends ExtensionPage {
     this.loading = true;
     const filters = {
       type: this.type(),
-      status: this.status()
+      status: this.status(),
     };
 
     return app.store
-      .find("/store/list", {
-        filter:filters,
+      .find('/store/list', {
+        filter: filters,
         page: {
           offset,
         },

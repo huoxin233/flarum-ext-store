@@ -10,10 +10,11 @@ class ObjectsUtil
      * @param array $params
      * @return array
      */
-    public static function removeEmpty(array $params) {
+    public static function removeEmpty(array $params)
+    {
         $result = [];
         foreach (array_keys($params) as $key) {
-            if (!empty($params[$key])) {
+            if (! empty($params[$key])) {
                 $result[$key] = $params[$key];
             }
         }
@@ -27,10 +28,11 @@ class ObjectsUtil
      * @param array $params
      * @return array
      */
-    public static function removeEmptySql(array $params) {
+    public static function removeEmptySql(array $params)
+    {
         $result = [];
         foreach (array_keys($params) as $key) {
-            if (!empty($params[$key]) || $params[$key] === 0 || $params[$key] === '0') {
+            if (! empty($params[$key]) || $params[$key] === 0 || $params[$key] === '0') {
                 $result[StringUtil::toUnderScore($key)] = $params[$key];
             }
         }

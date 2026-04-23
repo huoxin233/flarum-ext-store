@@ -8,8 +8,7 @@ use Flarum\Settings\SettingsRepositoryInterface;
 use Flarum\User\User;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class
-UserAttributes
+class UserAttributes
 {
     /**
      * @var SettingsRepositoryInterface|mixed
@@ -30,7 +29,8 @@ UserAttributes
     }
 
 
-    public function __invoke(BasicUserSerializer $serializer, User $user) {
+    public function __invoke(BasicUserSerializer $serializer, User $user)
+    {
         $attributes = [];
         $actor = $serializer->getActor();
 

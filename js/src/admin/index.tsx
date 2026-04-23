@@ -1,9 +1,10 @@
 import app from 'flarum/admin/app';
 import StoreListPage from './components/StoreListPage';
-import StorePage from "./components/StorePage";
+import StorePage from './components/StorePage';
 
 app.initializers.add('mattoid-store', () => {
-  app.extensionData.for("mattoid-store")
+  app.extensionData
+    .for('mattoid-store')
     // .registerSetting({
     //   setting: 'mattoid-store.storeName',
     //   help: app.translator.trans('mattoid-store.admin.settings.store-name-requirement'),
@@ -22,13 +23,17 @@ app.initializers.add('mattoid-store', () => {
         icon: 'fas fa-id-card',
         label: app.translator.trans('mattoid-store.admin.settings.group-view'),
         permission: 'mattoid-store.group-view',
-        allowGuest: true
-      }, 'view')
+        allowGuest: true,
+      },
+      'view'
+    )
     .registerPermission(
       {
         icon: 'fas fa-id-card',
         label: app.translator.trans('mattoid-store.admin.settings.group-view'),
         permission: 'mattoid-store.group-moderate',
-        allowGuest: true
-      }, 'moderate')
+        allowGuest: true,
+      },
+      'moderate'
+    );
 });

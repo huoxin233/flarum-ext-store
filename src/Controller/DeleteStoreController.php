@@ -19,7 +19,6 @@ use Tobscure\JsonApi\Document;
  */
 class DeleteStoreController extends AbstractCreateController
 {
-
     protected $url;
     protected $translator;
     protected $repository;
@@ -36,11 +35,12 @@ class DeleteStoreController extends AbstractCreateController
         $this->repository = $repository;
     }
 
-    protected function data(ServerRequestInterface $request, Document $document) {
+    protected function data(ServerRequestInterface $request, Document $document)
+    {
         $actor = RequestUtil::getActor($request);
         $parseBody = $request->getParsedBody();
 
-        if (!$actor->can('mattoid-store.group-moderate')) {
+        if (! $actor->can('mattoid-store.group-moderate')) {
             throw new PermissionDeniedException();
         }
 

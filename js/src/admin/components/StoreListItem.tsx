@@ -1,16 +1,16 @@
 import app from 'flarum/admin/app';
-import Component from "flarum/Component";
+import Component from 'flarum/Component';
 import Button from 'flarum/components/Button';
-import StoreModal from "./StoreModal";
-import StoreGoodsDetailModal from "./StoreGoodsDetailModal";
+import StoreModal from './StoreModal';
+import StoreGoodsDetailModal from './StoreGoodsDetailModal';
 
 export default class StoreListItem extends Component {
-  private storeData: object = {}
+  private storeData: object = {};
 
   oninit(vnode) {
     super.oninit(vnode);
 
-    this.storeData = this.attrs.item.attributes
+    this.storeData = this.attrs.item.attributes;
   }
 
   view() {
@@ -18,37 +18,42 @@ export default class StoreListItem extends Component {
     const price = moneyName.replace('[money]', this.storeData.price);
     const data = this.storeData;
 
-    const LimitUnit = {'days': '天', 'hour': '小时', 'minute': '分钟', 'second': '秒'};
+    const LimitUnit = { days: '天', hour: '小时', minute: '分钟', second: '秒' };
 
     return (
-      <div id={"goods" + this.storeData.id} className="storeItemContainer">
+      <div id={'goods' + this.storeData.id} className="storeItemContainer">
         <div className="leftAligned">
           <div className="margin">
             <span>
-              <Button className={'Button Button--primary'}
+              <Button
+                className={'Button Button--primary'}
                 onclick={() => {
-                  app.modal.show(StoreGoodsDetailModal, {storeData: data});
+                  app.modal.show(StoreGoodsDetailModal, { storeData: data });
                 }}
               >
                 {app.translator.trans('mattoid-store.admin.settings.goods-edit')}
               </Button>
             </span>
             <span className="margin">
-              <Button className={'Button Button--danger'}
+              <Button
+                className={'Button Button--danger'}
                 onclick={() => {
-                  app.modal.show(StoreModal, {storeData: data, title: 'delete'});
+                  app.modal.show(StoreModal, { storeData: data, title: 'delete' });
                 }}
               >
                 {app.translator.trans('mattoid-store.admin.settings.goods-delete')}
               </Button>
             </span>
             <span className="margin">
-              <Button className={'Button'}
+              <Button
+                className={'Button'}
                 onclick={() => {
-                  app.modal.show(StoreModal, {storeData: data, title: 'status-' + this.storeData.status});
+                  app.modal.show(StoreModal, { storeData: data, title: 'status-' + this.storeData.status });
                 }}
               >
-                {this.storeData.status === 0 ? app.translator.trans('mattoid-store.lib.item-status-1') : app.translator.trans('mattoid-store.lib.item-status-0')}
+                {this.storeData.status === 0
+                  ? app.translator.trans('mattoid-store.lib.item-status-1')
+                  : app.translator.trans('mattoid-store.lib.item-status-0')}
               </Button>
             </span>
           </div>
@@ -60,27 +65,41 @@ export default class StoreListItem extends Component {
             {app.translator.trans('mattoid-store.lib.item-desc')}: {this.storeData.desc}
           </div>
           <div>
-            {app.translator.trans('mattoid-store.lib.item-status')}: <span className={this.storeData.status === 0 ? 'red': 'green'}>{ app.translator.trans('mattoid-store.lib.item-status-' + this.storeData.status) }</span> |&nbsp;
+            {app.translator.trans('mattoid-store.lib.item-status')}:{' '}
+            <span className={this.storeData.status === 0 ? 'red' : 'green'}>
+              {app.translator.trans('mattoid-store.lib.item-status-' + this.storeData.status)}
+            </span>{' '}
+            |&nbsp;
             {app.translator.trans('mattoid-store.lib.item-price')}: {price} |&nbsp;
-            {app.translator.trans('mattoid-store.lib.item-stock')}: { this.storeData.stock == -99 ? '无限' : this.storeData.stock } |&nbsp;
+            {app.translator.trans('mattoid-store.lib.item-stock')}: {this.storeData.stock == -99 ? '无限' : this.storeData.stock} |&nbsp;
             {app.translator.trans('mattoid-store.lib.item-discount')}: {this.storeData.discount ? this.storeData.discount + ' %' : '无'} |&nbsp;
-            {app.translator.trans('mattoid-store.lib.item-discount_limit')}: {this.storeData.discountLimit || 0}&nbsp;{ LimitUnit[this.storeData.discountLimitUnit] }
+            {app.translator.trans('mattoid-store.lib.item-discount_limit')}: {this.storeData.discountLimit || 0}&nbsp;
+            {LimitUnit[this.storeData.discountLimitUnit]}
           </div>
           <div>
-            {app.translator.trans('mattoid-store.lib.item-type')}: {app.translator.trans('mattoid-store.lib.item-type-' + this.storeData.type)} |&nbsp;
+            {app.translator.trans('mattoid-store.lib.item-type')}: {app.translator.trans('mattoid-store.lib.item-type-' + this.storeData.type)}{' '}
+            |&nbsp;
             {app.translator.trans('mattoid-store.lib.item-created-at')}: {this.storeData.createdAt}
           </div>
         </div>
         <div className="rightAligned icon-size">
-        <img className="icon-size" src={this.storeData.icon}
-             style={this.storeData.icon && this.storeData.icon.slice(-5) === '.webm' ? 'display: none' : ''}/>
-        <video autoplay loop muted playsinline className="icon-size"
-               style={this.storeData.icon && this.storeData.icon.slice(-5) === '.webm' ? '' : 'display: none'}>
-          <source src={this.storeData.icon} type="video/webm"/>
-        </video>
+          <img
+            className="icon-size"
+            src={this.storeData.icon}
+            style={this.storeData.icon && this.storeData.icon.slice(-5) === '.webm' ? 'display: none' : ''}
+          />
+          <video
+            autoplay
+            loop
+            muted
+            playsinline
+            className="icon-size"
+            style={this.storeData.icon && this.storeData.icon.slice(-5) === '.webm' ? '' : 'display: none'}
+          >
+            <source src={this.storeData.icon} type="video/webm" />
+          </video>
         </div>
       </div>
-    )
+    );
   }
-
 }

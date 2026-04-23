@@ -14,7 +14,8 @@ class IconSerializer extends AbstractSerializer
         $this->translator = $translator;
     }
 
-    protected function getDefaultAttributes($data) {
+    protected function getDefaultAttributes($data)
+    {
         return [
             'uuid' => $data->uuid,
             'url' => $data->url,

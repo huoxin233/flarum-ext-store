@@ -39,23 +39,24 @@ class UseGoodsController extends AbstractCreateController
         $this->repository = $repository;
     }
 
-    protected function data(ServerRequestInterface $request, Document $document) {
+    protected function data(ServerRequestInterface $request, Document $document)
+    {
         $actor = RequestUtil::getActor($request);
         $params = $request->getParsedBody();
         $id = Arr::get($params, 'id');
 
-        if (!$actor->can('mattoid-store.group-moderate')) {
+        if (! $actor->can('mattoid-store.group-moderate')) {
             throw new PermissionDeniedException();
         }
 
         $cart = StoreCartModel::query()->where('id', $id)->where('user_id', $actor->id)->first();
         $enable = StoreExtend::getEnable($cart->code);
-        if (!$enable) {
+        if (! $enable) {
             throw new ValidationException(['message' => $this->translator->trans('mattoid-store.forum.error.cart-no-use')]);
         }
         $store = StoreModel::query()->where('id', $cart->store_id)->first();
-        $cart->enable = !$cart->enable;
-        if (!$enable::enable($actor, $store, $cart)) {
+        $cart->enable = ! $cart->enable;
+        if (! $enable::enable($actor, $store, $cart)) {
             throw new ValidationException(['message' => $this->translator->trans('mattoid-store.forum.error.cart-use-fail')]);
         }
 
