@@ -1,5 +1,5 @@
 import app from 'flarum/forum/app';
-import Component from 'flarum/Component';
+import Component from 'flarum/common/Component';
 import Button from 'flarum/common/components/Button';
 
 export default class StoreItem extends Component {
