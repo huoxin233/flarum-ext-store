@@ -14,6 +14,7 @@ use Mattoid\Store\Event\StoreInvalidEvent;
 use Mattoid\Store\Extend\StoreExtend;
 use Mattoid\Store\Model\StoreCartModel;
 use Mattoid\Store\Model\StoreModel;
+use AntoineFr\Money\Service\BalanceManager;
 
 /**
  * 处理失效商品通知逻辑
@@ -24,18 +25,26 @@ class GoodsInvalidCommand extends AbstractCommand
     protected $events;
     protected $settings;
     protected $translator;
+    protected $balances;
 
     private $storeTimezone = 'Asia/Shanghai';
 
-    public function __construct(SettingsRepositoryInterface $settings, TranslatorInterface $translator, Repository $cache, Dispatcher $events) {
+    public function __construct(
+        SettingsRepositoryInterface $settings,
+        TranslatorInterface $translator,
+        Repository $cache,
+        Dispatcher $events,
+        BalanceManager $balances
+    ) {
         parent::__construct();
         $this->cache = $cache;
         $this->events = $events;
         $this->settings = $settings;
         $this->translator = $translator;
+        $this->balances = $balances;
 
         $storeTimezone = $this->settings->get('mattoid-store.storeTimezone', 'Asia/Shanghai');
-        $this->storeTimezone = !!$storeTimezone ? $storeTimezone : 'Asia/Shanghai';
+        $this->storeTimezone = ! ! $storeTimezone ? $storeTimezone : 'Asia/Shanghai';
     }
 
     protected function configure()
@@ -48,12 +57,12 @@ class GoodsInvalidCommand extends AbstractCommand
         $storeMap = [];
         $dateTime = Carbon::now()->tz($this->storeTimezone);
         $invalidList = StoreCartModel::query()->where('outtime', '<=', $dateTime)->where('type', 'limit')->where('status', 1)->get();
-        if (!$invalidList) {
+        if ($invalidList->isEmpty()) {
             // 未发现失效商品，跳过处理
             return;
         }
 
-        $storeIdList = array_column(json_decode($invalidList, true), 'store_id');
+        $storeIdList = $invalidList->pluck('store_id')->unique()->toArray();
         $storeList = StoreModel::query()->whereIn('id', $storeIdList)->get();
         foreach ($storeList as $store) {
             $storeMap[$store->id] = $store;
@@ -62,7 +71,11 @@ class GoodsInvalidCommand extends AbstractCommand
         foreach ($invalidList as $cart) {
             $buyStatus = true;
             // 获取商品信息
-            $store = $storeMap[$cart->store_id];
+            $store = $storeMap[$cart->store_id] ?? null;
+            if (! $store) {
+                $this->error("[{$cart->store_id}] Store not found, skipping cart {$cart->id}");
+                continue;
+            }
             try {
                 // 自动扣费，扣费成功
                 $this->autoDeduction($store, $cart);
@@ -94,7 +107,7 @@ class GoodsInvalidCommand extends AbstractCommand
     private function autoDeduction(StoreModel $store, StoreCartModel $cart)
     {
         // 商品未开启自动扣费
-        if (!$cart->auto_deduction) {
+        if (! $cart->auto_deduction) {
             throw new ValidationException(['message' => $this->translator->trans('mattoid-store.forum.error.automatic-renewal')]);
         }
 
@@ -104,35 +117,37 @@ class GoodsInvalidCommand extends AbstractCommand
         }
 
         $key = md5("{$cart->store_id}-{$cart->user_id}");
-        if (!$this->cache->add($key, time(), 5)) {
+        if (! $this->cache->add($key, time(), 5)) {
             throw new ValidationException(['message' => $this->translator->trans('mattoid-store.forum.error.validate-fail')]);
         }
 
-        // 续费不参与折扣，且不处理库存
+        // 续费不参与折扣，且不处理库存由 BalanceManager 安全处理
         $user = User::query()->where('id', $cart->user_id)->first();
-        $money = $user->money;
-        $balance = $money - $cart->price;
-        if ($balance < 0) {
-            throw new ValidationException(['message' => $this->translator->trans('mattoid-store.forum.error.user-balance-low')]);
+
+        try {
+            $applied = $this->balances->applyBalanceChange(
+                $user,
+                -$cart->price,
+                'STORE_AUTO_DEDUCTION',
+                $this->translator->trans("mattoid-store.forum.auto-deduction", ['title' => $store->title]),
+                [
+                    'item_title' => $store->title,
+                ],
+                $user,
+                preventOverdraft: true
+            );
+
+            if (! $applied) {
+                throw new ValidationException(['message' => $this->translator->trans('mattoid-store.forum.error.user-balance-low')]);
+            }
+
+            // 刷新过期时间
+            $cart->pay_amt = $cart->price;
+            $cart->outtime = Carbon::now()->tz($this->storeTimezone)->addDays($store->outtime);
+            $cart->created_at = Carbon::now()->tz($this->storeTimezone);
+            $cart->save();
+        } finally {
+            $this->cache->delete($key);
         }
-
-        $user->money = $balance;
-        $user->where('money', $money);
-        if (!$user->save()) {
-            throw new ValidationException(['message' => $this->translator->trans('mattoid-store.forum.error.user-balance-low')]);
-        }
-
-        // 刷新过期时间
-        $cart->pay_amt = $cart->price;
-        $cart->outtime = Carbon::now()->tz($this->storeTimezone)->addDays($store->outtime);
-        $cart->created_at = Carbon::now()->tz($this->storeTimezone);
-        $cart->save();
-
-        // 通知资金消费记录插件
-        if (class_exists('Mattoid\MoneyHistory\Event\MoneyHistoryEvent')) {
-            $this->events->dispatch(new \Mattoid\MoneyHistory\Event\MoneyHistoryEvent($user, -$cart->price, 'AUTODEDUCTION', $this->translator->trans("mattoid-store.forum.auto-deduction", ['title' => $store->title]), ''));
-        }
-
-        $this->cache->delete($key);
     }
 }

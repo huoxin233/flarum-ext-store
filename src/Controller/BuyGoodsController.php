@@ -16,16 +16,15 @@ use Mattoid\Store\Event\StoreBuyFailEvent;
 use Mattoid\Store\Event\StoreCartAddEvent;
 use Mattoid\Store\Event\StoreBuyEvent;
 use Mattoid\Store\Event\StoreCartEditEvent;
-use Mattoid\Store\Event\StoreStockAddEvent;
 use Mattoid\Store\Extend\StoreExtend;
 use Mattoid\Store\Model\StoreCartModel;
 use Mattoid\Store\Model\StoreModel;
 use Flarum\User\Exception\PermissionDeniedException;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 use Mattoid\Store\Serializer\GoodsSerializer;
-use Mockery\Exception;
 use Psr\Http\Message\ServerRequestInterface;
 use Tobscure\JsonApi\Document;
+use AntoineFr\Money\Service\BalanceManager;
 
 /**
  * 购买商品
@@ -40,39 +39,48 @@ class BuyGoodsController extends AbstractListController
     protected $settings;
     protected $events;
     protected $cache;
+    protected $balances;
 
     private $storeTimezone = 'Asia/Shanghai';
 
 
-    public function __construct(SettingsRepositoryInterface $settings, UserRepository $repository, Dispatcher $events, Translator $translator, CacheContract $cache)
-    {
+    public function __construct(
+        SettingsRepositoryInterface $settings,
+        UserRepository $repository,
+        Dispatcher $events,
+        Translator $translator,
+        CacheContract $cache,
+        BalanceManager $balances
+    ) {
         $this->cache = $cache;
         $this->events = $events;
         $this->settings = $settings;
         $this->translator = $translator;
         $this->repository = $repository;
+        $this->balances = $balances;
 
         $storeTimezone = $this->settings->get('mattoid-store.storeTimezone', 'Asia/Shanghai');
-        $this->storeTimezone = !!$storeTimezone ? $storeTimezone : 'Asia/Shanghai';
+        $this->storeTimezone = ! ! $storeTimezone ? $storeTimezone : 'Asia/Shanghai';
     }
 
-    protected function data(ServerRequestInterface $request, Document $document) {
+    protected function data(ServerRequestInterface $request, Document $document)
+    {
         $actor = RequestUtil::getActor($request);
         $params = $request->getParsedBody();
         $id = Arr::get($params, 'id');
 
         // 验证是否有商店 查看/购买 权限
-        if (!$actor->can('mattoid-store.group-view')) {
+        if (! $actor->can('mattoid-store.group-view')) {
             throw new PermissionDeniedException();
         }
 
         $key = md5("{$params['id']}-{$actor->id}");
-        if (!$this->cache->add($key, time(), 5)) {
+        if (! $this->cache->add($key, time(), 5)) {
             throw new ValidationException(['message' => $this->translator->trans('mattoid-store.forum.error.validate-fail')]);
         }
 
         $store = StoreModel::query()->where('id', $id)->where('status', 1)->first();
-        if (!$store) {
+        if (! $store) {
             throw new ValidationException(['message' => $this->translator->trans('mattoid-store.forum.error.store-goods-non-existent')]);
         }
         if ($store->stock != -99 && $store->stock <= 0) {
@@ -80,8 +88,8 @@ class BuyGoodsController extends AbstractListController
         }
         if ($store->repeat == 0) {
             $storeCart = StoreCartModel::query()->where('user_id', $actor->id)->where('store_id', $store->id)
-                ->where('status', 1)->where(function($where) {
-                    $where->where(function($where) {
+                ->where('status', 1)->where(function ($where) {
+                    $where->where(function ($where) {
                         $where->where('type', 'limit')->where('outtime', '>=', Carbon::now()->tz($this->storeTimezone));
                     });
                     $where->orWhere('type', 'permanent');
@@ -93,23 +101,33 @@ class BuyGoodsController extends AbstractListController
 
         $validate = StoreExtend::getValidate($store->code);
         // $this->translator, $this->settings, $this->events, $this->cache
-        if ($validate && !$validate->validate($actor, $store, $params)) {
+        if ($validate && ! $validate->validate($actor, $store, $params)) {
             throw new ValidationException(['message' => $this->translator->trans('mattoid-store.forum.error.validate-fail')]);
         }
 
         $user = User::query()->where('id', $actor->id)->first();
-        // 开始扣费
+        // 开始扣费由 BalanceManager 处理以保证事务安全性和并发防透支机制
         $price = $store->price;
         // 计算折扣
         $time = time();
-        $endTime = Carbon::parse($store->updated_at)->tz($this->storeTimezone)->modify('+' . $store->discount_limit . ' ' . $store->discount_limit_unit)->getTimestamp();
+        $endTime = Carbon::parse($store->updated_at)->tz($this->storeTimezone)->modify('+'.$store->discount_limit.' '.$store->discount_limit_unit)->getTimestamp();
         if ($store->discount_price > 0 && $store->discount > 0 && $time < $endTime) {
             $price = $store->discount_price;
         }
 
-        $money = $user->money;
-        $balance = $money - $price;
-        if ($balance < 0) {
+        $applied = $this->balances->applyBalanceChange(
+            $user,
+            -$price,
+            'STORE_BUY_GOODS',
+            $this->translator->trans("mattoid-store.forum.buy-goods", ['title' => $store->title]),
+            [
+                'item_title' => $store->title,
+            ],
+            $user,
+            preventOverdraft: true
+        );
+
+        if (! $applied) {
             throw new ValidationException(['message' => $this->translator->trans('mattoid-store.forum.error.user-balance-low')]);
         }
 
@@ -117,30 +135,18 @@ class BuyGoodsController extends AbstractListController
         $carts = $this->events->dispatch(new StoreCartAddEvent($user, $store, $price));
         $cart = array_shift($carts);
 
-        $user->money = $balance;
-        $user->where('money', $money);
-        if (!$user->save()) {
-            // 扣费失败则累加库存
-            $carts = $this->events->dispatch(new StoreStockAddEvent($store));
-            throw new ValidationException(['message' => $this->translator->trans('mattoid-store.forum.error.user-balance-low')]);
-        }
-
-        // 通知资金消费记录插件
-        if (class_exists('Mattoid\MoneyHistory\Event\MoneyHistoryEvent')) {
-            $this->events->dispatch(new \Mattoid\MoneyHistory\Event\MoneyHistoryEvent($user, -$price, 'STOREBUYGOODS', $this->translator->trans("mattoid-store.forum.buy-goods", ['title' => $store->title]), ''));
-        }
-
         // 处理商品插件后置事件
         $after = StoreExtend::getAfter($store->code);
         if ($after) {
             // 商品处理失败，通知购买失败事件进行回滚操作
-            // $this->translator, $this->settings, $this->events, $this->cache
+            $afterSuccess = false;
             try {
-                if (!$after->after($actor, $store, $params)) {
-                    $this->events->dispatch(new StoreBuyFailEvent($user, $store, $cart, $params));
-                    throw new ValidationException(['message' => $this->translator->trans('mattoid-store.forum.error.buy-goods-fail', ['title' => $store->title])]);
-                }
-            } catch (Exception $e) {
+                $afterSuccess = $after->after($actor, $store, $params);
+            } catch (\Throwable $e) {
+                // after() threw an unexpected exception
+            }
+
+            if (! $afterSuccess) {
                 $this->events->dispatch(new StoreBuyFailEvent($user, $store, $cart, $params));
                 throw new ValidationException(['message' => $this->translator->trans('mattoid-store.forum.error.buy-goods-fail', ['title' => $store->title])]);
             }
