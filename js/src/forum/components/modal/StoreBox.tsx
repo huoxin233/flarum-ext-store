@@ -1,29 +1,41 @@
 import Modal, { IInternalModalAttrs } from 'flarum/common/components/Modal';
-import type Mithril from 'mithril';
 import Stream from 'flarum/common/utils/Stream';
 import Button from 'flarum/common/components/Button';
 import Switch from 'flarum/common/components/Switch';
 import Select from 'flarum/common/components/Select';
 import TextEditor from 'flarum/common/components/TextEditor';
+import app from 'flarum/forum/app';
+import type Mithril from 'mithril';
 
-interface IStoreModalAttrs extends IInternalModalAttrs {
-  storeData: object;
+interface StoreBoxAttrs extends IInternalModalAttrs {
+  storeData?: StoreItemData;
 }
 
-export default class StoreBox extends Modal<IStoreModalAttrs> {
-  private storeData: object = {};
-  private params: object = {};
+interface StoreBoxField {
+  prop: 'input' | 'switch' | 'select' | 'textarea';
+  label: string;
+  helpText: string;
+  value: string;
+  type?: string;
+  options?: Record<string, string>;
+}
+
+export default class StoreBox extends Modal<StoreBoxAttrs> {
+  private storeData: StoreItemData = {} as StoreItemData;
+  private params: Record<string, any> = {};
   private range: boolean = false;
 
-  static initAttrs(attrs: IStoreModalAttrs) {
+  loading: boolean = false;
+
+  static initAttrs(attrs: StoreBoxAttrs) {
     super.initAttrs(attrs);
   }
 
-  oninit(vnode: Mithril.Vnode<IStoreModalAttrs, this>) {
+  oninit(vnode: Mithril.Vnode<StoreBoxAttrs, this>) {
     super.oninit(vnode);
 
-    this.storeData = this.attrs.storeData;
-    this.params.id = this.attrs.storeData.id;
+    this.storeData = this.attrs.storeData || ({} as StoreItemData);
+    this.params.id = this.storeData.id;
   }
 
   title() {
@@ -31,12 +43,12 @@ export default class StoreBox extends Modal<IStoreModalAttrs> {
   }
 
   className(): string {
-    return this.storeData.className;
+    return this.storeData.className || '';
   }
 
   content() {
     return m('.Modal-body', [
-      this.getHtml(JSON.parse(this.storeData.popUp)),
+      this.getHtml(JSON.parse(this.storeData.popUp || '[]')),
       m('.Form-group .center', [
         Button.component(
           {
@@ -51,13 +63,13 @@ export default class StoreBox extends Modal<IStoreModalAttrs> {
     ]);
   }
 
-  getHtml(popUp) {
-    return popUp.map((item) => {
+  getHtml(popUp: StoreBoxField[]) {
+    return popUp.map((item: StoreBoxField) => {
       return this.getInput(item);
     });
   }
 
-  getInput(column) {
+  getInput(column: StoreBoxField) {
     let input;
 
     switch (column.prop) {
@@ -102,7 +114,7 @@ export default class StoreBox extends Modal<IStoreModalAttrs> {
             disabled: this.loading,
             options: column.options,
             buttonClassName: 'Button',
-            onchange: (val) => {
+            onchange: (val: string) => {
               this.params[column.value] = val;
             },
           }),
@@ -137,9 +149,8 @@ export default class StoreBox extends Modal<IStoreModalAttrs> {
       })
       .then(
         () => location.reload(),
-        (result) => {
+        () => {
           this.loading = false;
-          // this.handleErrors(result);
         }
       );
   }

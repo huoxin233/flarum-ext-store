@@ -1,12 +1,23 @@
 import app from 'flarum/admin/app';
-import Modal from 'flarum/common/components/Modal';
+import Modal, { IInternalModalAttrs } from 'flarum/common/components/Modal';
 import Button from 'flarum/common/components/Button';
+import type Mithril from 'mithril';
 
-export default class StoreModal extends Modal {
-  oninit(vnode) {
+interface StoreModalAttrs extends IInternalModalAttrs {
+  title?: string;
+  storeData?: StoreItemData;
+}
+
+export default class StoreModal extends Modal<StoreModalAttrs> {
+  private type: string = '';
+  private storeData: StoreItemData = {} as StoreItemData;
+
+  loading: boolean = false;
+
+  oninit(vnode: Mithril.Vnode) {
     super.oninit(vnode);
-    this.type = this.attrs.title;
-    this.storeData = this.attrs.storeData;
+    this.type = this.attrs.title ?? '';
+    this.storeData = this.attrs.storeData as StoreItemData;
   }
 
   className() {
@@ -46,7 +57,7 @@ export default class StoreModal extends Modal {
     );
   }
 
-  onsubmit(e) {
+  onsubmit(e: Event) {
     e.preventDefault();
 
     this.loading = true;
@@ -63,10 +74,9 @@ export default class StoreModal extends Modal {
       })
       .then(
         () => location.reload(),
-        (result) => {
+        () => {
           this.loading = false;
           this.storeData.status = status;
-          this.handleErrors(result);
         }
       );
   }

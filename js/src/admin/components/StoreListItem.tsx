@@ -1,13 +1,18 @@
 import app from 'flarum/admin/app';
-import Component from 'flarum/common/Component';
+import Component, { ComponentAttrs } from 'flarum/common/Component';
 import Button from 'flarum/common/components/Button';
 import StoreModal from './StoreModal';
 import StoreGoodsDetailModal from './StoreGoodsDetailModal';
+import type Mithril from 'mithril';
 
-export default class StoreListItem extends Component {
-  private storeData: object = {};
+interface StoreListItemAttrs extends ComponentAttrs {
+  item: StoreApiResource;
+}
 
-  oninit(vnode) {
+export default class StoreListItem extends Component<StoreListItemAttrs> {
+  private storeData: StoreItemData = {} as StoreItemData;
+
+  oninit(vnode: Mithril.Vnode) {
     super.oninit(vnode);
 
     this.storeData = this.attrs.item.attributes;
@@ -15,10 +20,10 @@ export default class StoreListItem extends Component {
 
   view() {
     const moneyName = app.forum.attribute('antoinefr-money.moneyname') || '[money]';
-    const price = moneyName.replace('[money]', this.storeData.price);
+    const price = moneyName.replace('[money]', this.storeData.price.toString());
     const data = this.storeData;
 
-    const LimitUnit = { days: '天', hour: '小时', minute: '分钟', second: '秒' };
+    const LimitUnit: Record<string, string> = { days: '天', hour: '小时', minute: '分钟', second: '秒' };
 
     return (
       <div id={'goods' + this.storeData.id} className="storeItemContainer">

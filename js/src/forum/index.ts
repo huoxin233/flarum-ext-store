@@ -16,9 +16,10 @@ app.initializers.add('mattoid/store', () => {
     component: MyCartPage,
   };
 
-  extend(UserPage.prototype, 'navItems', function (items) {
-    if (!app.session || !app.session.user || !app.session.user.attribute('canStoreView')) {
-      return false;
+  extend(UserPage.prototype, 'navItems', function (this: UserPage, items) {
+    const user = this.user;
+    if (!app.session?.user || !app.session.user.attribute('canStoreView') || !user) {
+      return;
     }
 
     items.add(
@@ -26,7 +27,7 @@ app.initializers.add('mattoid/store', () => {
       LinkButton.component(
         {
           href: app.route('myCartPage', {
-            username: this.user.slug(),
+            username: user.slug(),
           }),
           icon: 'fas fa-shopping-cart',
         },
@@ -37,7 +38,7 @@ app.initializers.add('mattoid/store', () => {
 
   extend(IndexPage.prototype, 'navItems', function (items) {
     if (!app.session || !app.session.user || !app.session.user.attribute('canStoreView')) {
-      return false;
+      return;
     }
 
     items.add(

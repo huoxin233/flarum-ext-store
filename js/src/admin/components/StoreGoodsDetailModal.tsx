@@ -1,16 +1,23 @@
 import app from 'flarum/admin/app';
-import Modal from 'flarum/common/components/Modal';
+import Modal, { IInternalModalAttrs } from 'flarum/common/components/Modal';
 import Button from 'flarum/common/components/Button';
 import Stream from 'flarum/common/utils/Stream';
 import Switch from 'flarum/common/components/Switch';
 import Select from 'flarum/common/components/Select';
+import type Mithril from 'mithril';
 
-export default class StoreGoodsDetailModal extends Modal {
+interface StoreGoodsDetailModalAttrs extends IInternalModalAttrs {
+  code?: string;
+  title?: string;
+  storeData?: StoreItemData;
+}
+
+export default class StoreGoodsDetailModal extends Modal<StoreGoodsDetailModalAttrs> {
   private pageTitle: string = '';
   private moreResults: boolean = false;
-  private iconList: Array = [];
+  private iconList: StoreApiResource[] = [];
   private method: string = 'POST';
-  private params: object = {
+  private params: Record<string, any> = {
     status: Stream(1),
     code: Stream(),
     title: Stream(),
@@ -28,14 +35,14 @@ export default class StoreGoodsDetailModal extends Modal {
     autoDeduction: Stream(0),
   };
 
-  oninit(vnode) {
+  oninit(vnode: Mithril.Vnode<StoreGoodsDetailModalAttrs, this>) {
     super.oninit(vnode);
 
     this.method = 'POST';
     this.moreResults = false;
     this.params.code = Stream(this.attrs.code || '');
     this.params.title = Stream(this.attrs.title || '');
-    this.pageTitle = this.attrs.title;
+    this.pageTitle = (this.attrs.title || '').toString();
 
     if (this.attrs.storeData) {
       this.method = 'PUT';
@@ -92,7 +99,7 @@ export default class StoreGoodsDetailModal extends Modal {
                 <span style="margin-left: 15px;">
                   <Switch
                     state={this.params.status()}
-                    onchange={(val) => {
+                    onchange={(val: boolean) => {
                       this.params.status = Stream(Number(val));
                     }}
                   >
@@ -175,7 +182,7 @@ export default class StoreGoodsDetailModal extends Modal {
                     second: app.translator.trans('mattoid-store.lib.item-limit-unit-second'),
                   },
                   value: this.params.discountLimitUnit(),
-                  onchange: (val) => {
+                  onchange: (val: string) => {
                     this.params.discountLimitUnit = Stream(val);
                   },
                 })}
@@ -189,7 +196,7 @@ export default class StoreGoodsDetailModal extends Modal {
                     limit: app.translator.trans('mattoid-store.lib.item-type-limit'),
                   },
                   value: this.params.type(),
-                  onchange: (val) => {
+                  onchange: (val: string) => {
                     this.params.type = Stream(val);
                   },
                 })}
@@ -215,7 +222,7 @@ export default class StoreGoodsDetailModal extends Modal {
                   <span style="margin-left: 15px;">
                     <Switch
                       state={this.params.autoDeduction()}
-                      onchange={(val) => {
+                      onchange={(val: boolean) => {
                         this.params.autoDeduction = Stream(Number(val));
                       }}
                     ></Switch>
@@ -232,7 +239,7 @@ export default class StoreGoodsDetailModal extends Modal {
                   <div style="margin-top: 5px; display: inline-block;">
                     <Button
                       className="Button Button--primary"
-                      onclick={(e) => {
+                      onclick={(e: MouseEvent) => {
                         this.uploadIcon(e);
                       }}
                     >
@@ -242,7 +249,7 @@ export default class StoreGoodsDetailModal extends Modal {
                   <div style="margin-top: 5px; display: inline-block; margin-left: 26px;">
                     <Button
                       className="Button Button--primary"
-                      onclick={(e) => {
+                      onclick={(e: MouseEvent) => {
                         this.showIcon(e);
                       }}
                     >
@@ -274,7 +281,7 @@ export default class StoreGoodsDetailModal extends Modal {
                 <div style="width: 200px; display: inline-block;">
                   <Switch
                     state={this.params.repeat()}
-                    onchange={(val) => {
+                    onchange={(val: boolean) => {
                       this.params.repeat = Stream(Number(val));
                     }}
                   >
@@ -284,7 +291,7 @@ export default class StoreGoodsDetailModal extends Modal {
                 <div style="width: 200px; display: inline-block; margin-left: 26px;">
                   <Switch
                     state={this.params.hide()}
-                    onchange={(val) => {
+                    onchange={(val: boolean) => {
                       this.params.hide = Stream(Number(val));
                     }}
                   >
@@ -381,7 +388,7 @@ export default class StoreGoodsDetailModal extends Modal {
       .then(this.parseResults.bind(this));
   }
 
-  parseResults(results) {
+  parseResults(results: any) {
     this.moreResults = !!results.payload.links && !!results.payload.links.next;
     [].push.apply(this.iconList, results.payload.data);
     this.loading = false;
@@ -400,7 +407,7 @@ export default class StoreGoodsDetailModal extends Modal {
   }
 
   closeIcon() {
-    this.pageTitle = this.attrs.title;
+    this.pageTitle = (this.attrs.title || '').toString();
     $('#StoreGoods').css('display', 'block');
     $('#storeCloseButton').css('display', 'block');
     $('#StoreIcon').css('display', 'none');
@@ -408,8 +415,8 @@ export default class StoreGoodsDetailModal extends Modal {
     m.redraw();
   }
 
-  selectIconItem(url) {
-    this.pageTitle = this.attrs.title;
+  selectIconItem(url: string) {
+    this.pageTitle = (this.attrs.title || '').toString();
     $('#StoreGoods').css('display', 'block');
     $('#storeCloseButton').css('display', 'block');
     $('#StoreIcon').css('display', 'none');
@@ -417,17 +424,17 @@ export default class StoreGoodsDetailModal extends Modal {
     this.params.icon(url);
   }
 
-  showIcon(event) {
+  showIcon(event: MouseEvent) {
     $('#StoreGoods').css('display', 'none');
     $('#storeCloseButton').css('display', 'none');
     $('#StoreIcon').css('display', 'block');
     $('#storeCloseIconButton').css('display', 'block');
-    this.pageTitle = app.translator.trans('mattoid-store.admin.settings.show-icon-button');
+    this.pageTitle = app.translator.trans('mattoid-store.admin.settings.show-icon-button').toString();
     this.iconList = [];
     this.loadIconList();
   }
 
-  uploadIcon(event) {
+  uploadIcon(event: Event) {
     event.preventDefault();
 
     const $input = $('<input type="file">');
@@ -436,9 +443,12 @@ export default class StoreGoodsDetailModal extends Modal {
       .appendTo('body')
       .hide()
       .trigger('click')
-      .on('change', (event) => {
+      .on('change', (event: Event) => {
         const body = new FormData();
-        body.append('file', event.target.files[0]);
+        const files = (event.target as HTMLInputElement).files;
+        if (files) {
+          body.append('file', files[0]);
+        }
 
         app
           .request({
@@ -446,7 +456,7 @@ export default class StoreGoodsDetailModal extends Modal {
             method: 'POST',
             body,
           })
-          .then((result) => {
+          .then((result: any) => {
             this.params.icon = Stream(result.data.attributes.path);
             this.loading = false;
             m.redraw();
@@ -454,7 +464,7 @@ export default class StoreGoodsDetailModal extends Modal {
       });
   }
 
-  onsubmit(e) {
+  onsubmit(e: Event) {
     e.preventDefault();
 
     this.loading = true;
@@ -467,9 +477,8 @@ export default class StoreGoodsDetailModal extends Modal {
       })
       .then(
         () => location.reload(),
-        (result) => {
+        () => {
           this.loading = false;
-          this.handleErrors(result);
         }
       );
   }

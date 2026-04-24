@@ -1,21 +1,27 @@
 import app from 'flarum/forum/app';
-import Component from 'flarum/common/Component';
+import Component, { ComponentAttrs } from 'flarum/common/Component';
 import StoreBox from '../modal/StoreBox';
+import type Mithril from 'mithril';
 
-export default class StoreItem extends Component {
-  private storeData: object = {};
+interface StoreItemAttrs extends ComponentAttrs {
+  item: StoreApiResource;
+}
 
-  oninit(vnode) {
+export default class StoreItem extends Component<StoreItemAttrs> {
+  private storeData: StoreItemData = {} as StoreItemData;
+
+  oninit(vnode: Mithril.Vnode) {
     super.oninit(vnode);
 
     this.storeData = this.attrs.item.attributes;
-    this.storeData.id = this.attrs.item.id;
+    this.storeData.id = this.attrs.item.id as number;
   }
 
   view() {
     const moneyName = app.forum.attribute('antoinefr-money.moneyname') || '[money]';
-    const price = this.storeData.price > 0 ? moneyName.replace('[money]', this.storeData.price) : app.translator.trans('mattoid-store.forum.free');
-    const discountPrice = moneyName.replace('[money]', this.storeData.discountPrice);
+    const price =
+      this.storeData.price > 0 ? moneyName.replace('[money]', this.storeData.price.toString()) : app.translator.trans('mattoid-store.forum.free');
+    const discountPrice = moneyName.replace('[money]', (this.storeData.discountPrice || 0).toString());
 
     return (
       <div id={'goods' + this.storeData.id} onclick={() => this.showDetails(this.storeData)}>
@@ -69,7 +75,7 @@ export default class StoreItem extends Component {
     );
   }
 
-  showDetails(storeData) {
+  showDetails(storeData: StoreItemData) {
     if (app.session.user) {
       app.modal.show(StoreBox, { storeData });
     }

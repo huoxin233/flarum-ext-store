@@ -1,12 +1,18 @@
 import app from 'flarum/forum/app';
-import Component from 'flarum/common/Component';
+import Component, { ComponentAttrs } from 'flarum/common/Component';
 import Button from 'flarum/common/components/Button';
+import type Mithril from 'mithril';
 
-export default class StoreItem extends Component {
-  private cartData: any = {};
-  private params: any = {};
+interface CartItemAttrs extends ComponentAttrs {
+  item: StoreApiResource;
+}
 
-  oninit(vnode) {
+export default class StoreItem extends Component<CartItemAttrs> {
+  private cartData: StoreItemData = {} as StoreItemData;
+  private params: Record<string, any> = {};
+  private loading: boolean = false;
+
+  oninit(vnode: Mithril.Vnode) {
     super.oninit(vnode);
 
     this.cartData = this.attrs.item.attributes;
@@ -14,7 +20,7 @@ export default class StoreItem extends Component {
   }
 
   view() {
-    const statusStr = {
+    const statusStr: Record<number, { class: string; value: string }> = {
       0: {
         class: '',
         value: '未支付',
@@ -33,8 +39,14 @@ export default class StoreItem extends Component {
       },
     };
     const moneyName = app.forum.attribute('antoinefr-money.moneyname') || '[money]';
-    const price = this.cartData.price > 0 ? moneyName.replace('[money]', this.cartData.price) : app.translator.trans('mattoid-store.forum.free');
-    const payAmt = this.cartData.payAmt > 0 ? moneyName.replace('[money]', this.cartData.payAmt) : app.translator.trans('mattoid-store.forum.free');
+    const price =
+      (this.cartData.price || 0) > 0
+        ? moneyName.replace('[money]', (this.cartData.price || 0).toString())
+        : app.translator.trans('mattoid-store.forum.free');
+    const payAmt =
+      (this.cartData.payAmt || 0) > 0
+        ? moneyName.replace('[money]', (this.cartData.payAmt || 0).toString())
+        : app.translator.trans('mattoid-store.forum.free');
     return (
       <div className="frame">
         <div className="row margin-top-10">
@@ -77,7 +89,7 @@ export default class StoreItem extends Component {
                     type: 'submit',
                     className: 'Button Button--primary margin-left-30',
                     loading: this.loading,
-                    onclick: (e) => {
+                    onclick: (e: Event) => {
                       this.onsubmit(e);
                     },
                   },
@@ -104,9 +116,8 @@ export default class StoreItem extends Component {
       })
       .then(
         () => location.reload(),
-        (result) => {
+        () => {
           this.loading = false;
-          // this.handleErrors(result);
         }
       );
   }
