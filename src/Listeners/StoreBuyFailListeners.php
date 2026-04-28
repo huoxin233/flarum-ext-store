@@ -59,5 +59,7 @@ class StoreBuyFailListeners
             $user,
             preventOverdraft: false
         );
+
+        $user->save();
     }
 }

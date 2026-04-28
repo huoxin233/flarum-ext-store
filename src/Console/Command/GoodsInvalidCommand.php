@@ -141,6 +141,8 @@ class GoodsInvalidCommand extends AbstractCommand
                 throw new ValidationException(['message' => $this->translator->trans('mattoid-store.forum.error.user-balance-low')]);
             }
 
+            $user->save();
+
             // 刷新过期时间
             $cart->pay_amt = $cart->price;
             $cart->outtime = Carbon::now()->tz($this->storeTimezone)->addDays($store->outtime);

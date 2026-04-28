@@ -131,6 +131,8 @@ class BuyGoodsController extends AbstractListController
             throw new ValidationException(['message' => $this->translator->trans('mattoid-store.forum.error.user-balance-low')]);
         }
 
+        $user->save();
+
         // 加入购物车 购物车会自动扣除库存
         $carts = $this->events->dispatch(new StoreCartAddEvent($user, $store, $price));
         $cart = array_shift($carts);
