@@ -3,6 +3,7 @@
 namespace Mattoid\Store\Controller;
 
 use Flarum\Api\Controller\AbstractCreateController;
+use Flarum\Foundation\ValidationException;
 use Flarum\Http\RequestUtil;
 use Flarum\Http\UrlGenerator;
 use Flarum\Locale\Translator;
@@ -14,12 +15,11 @@ use Psr\Http\Message\ServerRequestInterface;
 use Tobscure\JsonApi\Document;
 
 /**
- * 从商店删除商品
- * Delete item from store
+ * 从商店删除商品（软删除，V-11）
+ * Delete item from store (soft delete, V-11)
  */
 class DeleteStoreController extends AbstractCreateController
 {
-
     protected $url;
     protected $translator;
     protected $repository;
@@ -36,16 +36,22 @@ class DeleteStoreController extends AbstractCreateController
         $this->repository = $repository;
     }
 
-    protected function data(ServerRequestInterface $request, Document $document) {
+    protected function data(ServerRequestInterface $request, Document $document)
+    {
         $actor = RequestUtil::getActor($request);
         $parseBody = $request->getParsedBody();
 
-        if (!$actor->can('mattoid-store.group-moderate')) {
+        if (! $actor->can('mattoid-store.group-moderate')) {
             throw new PermissionDeniedException();
         }
 
-        $result = StoreModel::query()->where('id', $parseBody['id'])->delete();
+        $id = $parseBody['id'] ?? null;
+        if (! $id) {
+            throw new ValidationException(['message' => $this->translator->trans('mattoid-store.admin.error.invalid-product')]);
+        }
 
-        return $result;
+        // 软删除（V-11）：保留 store_cart 历史数据的可解析性
+        // Soft delete (V-11): keep historical store_cart records resolvable
+        return StoreModel::query()->where('id', $id)->delete();
     }
 }

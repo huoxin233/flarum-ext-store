@@ -17,7 +17,6 @@ use Tobscure\JsonApi\Document;
 
 class ListCartController extends AbstractListController
 {
-
     protected $url;
     protected $translator;
     protected $repository;
@@ -34,7 +33,8 @@ class ListCartController extends AbstractListController
         $this->repository = $repository;
     }
 
-    protected function data(ServerRequestInterface $request, Document $document) {
+    protected function data(ServerRequestInterface $request, Document $document)
+    {
         $actor = RequestUtil::getActor($request);
         $params = $request->getQueryParams();
         $limit = $this->extractLimit($request);
@@ -44,7 +44,7 @@ class ListCartController extends AbstractListController
         $autoDeduction = Arr::get($params, 'filter.autoDeduction');
         $filter = [];
 
-        if (!$actor->can('mattoid-store.group-view')) {
+        if (! $actor->can('mattoid-store.group-view')) {
             throw new PermissionDeniedException();
         }
 
@@ -66,16 +66,23 @@ class ListCartController extends AbstractListController
             ->orderByDesc('created_at')
             ->get();
 
+        // 性能优化：按 code 预计算 enableType，避免 N 次 resolve
+        // Perf: precompute enableType per code to avoid N resolves
+        $enableMap = [];
         foreach ($list as $item) {
-            $item->enableType = StoreExtend::getEnable($item->code) ? 1 : 0;
+            $code = $item->code;
+            if (! array_key_exists($code, $enableMap)) {
+                $enableMap[$code] = StoreExtend::getEnable($code) ? 1 : 0;
+            }
+            $item->enableType = $enableMap[$code];
         }
 
         $results = $limit > 0 && $list->count() > $limit;
-        if($results){
+        if ($results) {
             $list->pop();
         }
         $document->addPaginationLinks(
-            $this->url->to('api')->route('store.icon.list'),
+            $this->url->to('api')->route('store.cart.list'),
             $params,
             $offset,
             $limit,

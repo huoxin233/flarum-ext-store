@@ -18,8 +18,14 @@ use Psr\Http\Message\ServerRequestInterface;
 use Tobscure\JsonApi\Document;
 
 /**
- * 从商店删除商品
- * Delete item from store
+ * 用户在购物车点击「使用 / 取消使用」商品（V-06）
+ * Toggle the enable state of a cart item.
+ *
+ * 修复要点：
+ * - V-06: 权限从 group-moderate 改为 group-view（cart 已按 user_id 隔离）
+ * - V-06: 增加 cart null 校验，避免 NPE
+ * - V-05: catch Throwable 避免商品插件异常吞没
+ * - 软删除商品（V-11）兼容：使用 withTrashed 读取 store 快照
  */
 class UseGoodsController extends AbstractCreateController
 {
@@ -39,28 +45,60 @@ class UseGoodsController extends AbstractCreateController
         $this->repository = $repository;
     }
 
-    protected function data(ServerRequestInterface $request, Document $document) {
+    protected function data(ServerRequestInterface $request, Document $document)
+    {
         $actor = RequestUtil::getActor($request);
         $params = $request->getParsedBody();
         $id = Arr::get($params, 'id');
 
-        if (!$actor->can('mattoid-store.group-moderate')) {
+        // V-06: cart 与 actor 已通过 user_id 隔离，仅需 group-view 权限
+        // V-06: cart is isolated by user_id, view permission is sufficient
+        if (! $actor->can('mattoid-store.group-view')) {
             throw new PermissionDeniedException();
         }
 
-        $cart = StoreCartModel::query()->where('id', $id)->where('user_id', $actor->id)->first();
-        $enable = StoreExtend::getEnable($cart->code);
-        if (!$enable) {
+        if (! $id) {
             throw new ValidationException(['message' => $this->translator->trans('mattoid-store.forum.error.cart-no-use')]);
         }
-        $store = StoreModel::query()->where('id', $cart->store_id)->first();
-        $cart->enable = !$cart->enable;
-        if (!$enable::enable($actor, $store, $cart)) {
+
+        $cart = StoreCartModel::query()
+            ->where('id', $id)
+            ->where('user_id', $actor->id)
+            ->where('status', 1)
+            ->first();
+
+        // V-06: NPE 防御
+        // V-06: NPE guard
+        if (! $cart) {
+            throw new ValidationException(['message' => $this->translator->trans('mattoid-store.forum.error.cart-no-use')]);
+        }
+
+        $enable = StoreExtend::getEnable($cart->code);
+        if (! $enable) {
+            throw new ValidationException(['message' => $this->translator->trans('mattoid-store.forum.error.cart-no-use')]);
+        }
+
+        // 软删除场景下保留对历史商品的访问能力
+        // Allow access to soft-deleted stores for historical carts
+        $store = StoreModel::withTrashed()->where('id', $cart->store_id)->first();
+        if (! $store) {
+            throw new ValidationException(['message' => $this->translator->trans('mattoid-store.forum.error.store-goods-non-existent')]);
+        }
+
+        $cart->enable = ! $cart->enable ? 1 : 0;
+
+        // V-05: catch Throwable，避免商品插件抛非 Exception 异常时静默失败
+        // V-05: catch Throwable to avoid silent failure
+        try {
+            $ok = $enable::enable($actor, $store, $cart);
+        } catch (\Throwable $e) {
             throw new ValidationException(['message' => $this->translator->trans('mattoid-store.forum.error.cart-use-fail')]);
         }
 
-        $result = $cart->save();
+        if (! $ok) {
+            throw new ValidationException(['message' => $this->translator->trans('mattoid-store.forum.error.cart-use-fail')]);
+        }
 
-        return $result;
+        return $cart->save();
     }
 }

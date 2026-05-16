@@ -3,38 +3,65 @@
 namespace Mattoid\Store\Model;
 
 use Flarum\Database\AbstractModel;
-use Flarum\Formatter\Formatter;
+use Flarum\User\User;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * 购物车 / 购买记录模型（store_cart 表）
+ * Cart / purchase history model.
+ *
+ * @property int    $id
+ * @property int    $user_id
+ * @property int    $store_id
+ * @property string $code
+ * @property string $title
+ * @property float  $price
+ * @property float  $pay_amt
+ * @property string $type
+ * @property string $outtime
+ * @property int    $status
+ * @property int    $auto_deduction
+ * @property int    $enable
+ */
 class StoreCartModel extends AbstractModel
 {
+    protected $table = 'store_cart';
 
-    protected $table = "store_cart";
+    protected $fillable = [
+        'user_id', 'store_id', 'code', 'title',
+        'price', 'pay_amt', 'type', 'outtime',
+        'status', 'auto_deduction', 'enable',
+        'created_at', 'updated_at',
+    ];
+
+    protected $casts = [
+        'price' => 'decimal:2',
+        'pay_amt' => 'decimal:2',
+        'status' => 'integer',
+        'user_id' => 'integer',
+        'store_id' => 'integer',
+        'auto_deduction' => 'integer',
+        'enable' => 'integer',
+        'outtime' => 'datetime',
+    ];
+
+    protected $dates = ['created_at', 'updated_at', 'outtime'];
 
     /**
-     * The text formatter instance.
-     *
-     * @var \Flarum\Formatter\Formatter
+     * 用户关联
+     * Belongs-to User relation.
      */
-    protected static $formatter;
-
-    /**
-     * Get the text formatter instance.
-     *
-     * @return \Flarum\Formatter\Formatter
-     */
-    public static function getFormatter()
+    public function user(): BelongsTo
     {
-        return static::$formatter;
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     /**
-     * Set the text formatter instance.
-     *
-     * @param \Flarum\Formatter\Formatter $formatter
+     * 商品关联（支持读取已软删除商品的快照信息）
+     * Belongs-to Store relation (withTrashed for orphan resilience).
      */
-    public static function setFormatter(Formatter $formatter)
+    public function store(): BelongsTo
     {
-        static::$formatter = $formatter;
+        return $this->belongsTo(StoreModel::class, 'store_id')->withTrashed();
     }
-
 }

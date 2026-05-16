@@ -42,7 +42,7 @@ class ListIconController extends AbstractListController
         $limit = $this->extractLimit($request);
         $offset = $this->extractOffset($request);
 
-        if (!$actor->can('mattoid-store.group-view')) {
+        if (! $actor->can('mattoid-store.group-moderate')) {
             throw new PermissionDeniedException();
         }
 

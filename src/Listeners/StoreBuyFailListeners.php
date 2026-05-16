@@ -2,53 +2,89 @@
 
 namespace Mattoid\Store\Listeners;
 
+use AntoineFr\Money\Service\BalanceManager;
 use Flarum\Locale\Translator;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Flarum\User\User;
 use Illuminate\Contracts\Events\Dispatcher;
 use Mattoid\Store\Event\StoreBuyFailEvent;
 use Mattoid\Store\Event\StoreCartEditEvent;
-use Mattoid\Store\Event\StoreStockSubEvent;
+use Psr\Log\LoggerInterface;
 
 /**
  * 购买失败处理逻辑
- * Purchase failure processing logic
+ * Purchase failure handling.
+ *
+ * 修复要点：
+ * - 02: BalanceManager 替代手写乐观锁退款
+ * - V-16: 移除 MoneyHistory 软依赖（BalanceManager 自动写流水）
+ * - V-05: catch Throwable
  */
 class StoreBuyFailListeners
 {
     private $events;
     private $settings;
     private $translator;
+    private $balances;
+    private $logger;
 
-
-    public function __construct(Dispatcher $events, SettingsRepositoryInterface $settings, Translator $translator)
-    {
+    public function __construct(
+        Dispatcher $events,
+        SettingsRepositoryInterface $settings,
+        Translator $translator,
+        BalanceManager $balances,
+        LoggerInterface $logger
+    ) {
         $this->events = $events;
         $this->settings = $settings;
         $this->translator = $translator;
+        $this->balances = $balances;
+        $this->logger = $logger;
     }
 
-    public function handle(StoreBuyFailEvent $event) {
+    public function handle(StoreBuyFailEvent $event)
+    {
         $cart = $event->cart;
         $store = $event->store;
 
-        // 通知购物车购买失败
-        // Notify shopping cart purchase failure
+        // 标记购物车失败（监听器会回滚库存）
+        // Mark cart as failed (listener will roll back stock)
         $cart->status = 2;
-        $this->events->dispatch(new StoreCartEditEvent($cart));
+        try {
+            $this->events->dispatch(new StoreCartEditEvent($cart));
+        } catch (\Throwable $e) {
+            $this->logger->error('store.buy.fail_cart_edit', [
+                'cart_id' => $cart->id ?? null,
+                'exception' => (string) $e,
+            ]);
+        }
 
-        // 回滚用户余额
-        // Rollback user balance
         $user = User::query()->where('id', $event->user->id)->first();
-        $money = $user->money;
-        $user->money = $user->money + $cart->pay_amt;
-        $user->where('money', $money);
-        $user->save();
+        if (! $user) {
+            return;
+        }
 
-        // 通知资金消费记录插件资金回滚
-        // Notify the fund consumption record plugin to roll back funds
-        if (class_exists('Mattoid\MoneyHistory\Event\MoneyHistoryEvent')) {
-            $this->events->dispatch(new \Mattoid\MoneyHistory\Event\MoneyHistoryEvent($user, $cart->pay_amt, 'STOREBUYGOODSFAIL', $this->translator->trans("mattoid-store.forum.buy-goods-fail", ['title' => $store->title]), ''));
+        try {
+            // 02: BalanceManager 退款 + 资金流水
+            $this->balances->applyBalanceChange(
+                $user,
+                (float) $cart->pay_amt,
+                'STORE_BUY_GOODS_FAIL',
+                $this->translator->trans('mattoid-store.forum.buy-goods-fail', ['title' => $store->title]),
+                [
+                    'item_title' => $store->title,
+                ],
+                $user,
+                preventOverdraft: false
+            );
+
+            $user->save();
+        } catch (\Throwable $e) {
+            $this->logger->error('store.buy.refund_failed', [
+                'user_id' => $user->id,
+                'cart_id' => $cart->id ?? null,
+                'exception' => (string) $e,
+            ]);
         }
     }
 }
