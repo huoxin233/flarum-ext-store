@@ -6,6 +6,7 @@ mattoid-store:
       store-timezone: 时区设置
       store-timezone-requirement: 设置时区。默认为 "Asia/Shanghai"
       group-view: 允许用户组访问商店
+      group-moderate: 允许用户组管理商店
       add-store-goods: 添加商品
       edit-store-goods: 修改商品
       goods-status: 商品状态
@@ -37,7 +38,9 @@ mattoid-store:
       validate-fail: 购买物品失败
 
   forum:
-    tital: 商店
+    title: 商店
+    # tital 为历史拼写错误的兼容别名（V-14），新代码请使用 title
+    tital: => mattoid-store.forum.title
     button: 购买
     buy-goods: 购买商品：{title}
     buy-goods-fail: 商品退款：{title}
@@ -54,8 +57,11 @@ mattoid-store:
       store-goods-non-existent: 商品不存在或已下架
       validate-fail: 购买物品失败
       cannot-purchase-repeatedly: 有效期内不允许重复购买
+      # cannot-Goods-repeatedly 为历史拼写错误的兼容别名
+      cannot-Goods-repeatedly: => mattoid-store.forum.error.cannot-purchase-repeatedly
       buy-goods-fail: 购买【{title}】失败
       file-exist: 文件已存在
+      file-required: 请选择需要上传的文件
       automatic-renewal: 未开启自动续费
       invalid-product: 无效商品
       automatic-renewal-fail: 自动续费失败【{message}】
@@ -63,6 +69,7 @@ mattoid-store:
       goods-invalid-event-fail: 商品失效事件推送失败【{message}】
       cart-no-use: 该商品没有使用功能
       cart-use-fail: 商品使用失败
+      cart-not-found: 购物车记录不存在
 
   lib:
     item-status-all: 全部商品状态
@@ -80,6 +87,7 @@ mattoid-store:
     item-cart-status-0: 未支付
     item-cart-status-1: 已支付
     item-cart-status-2: 已失效
+    item-cart-status-9: 超时失效
 
     item-cart-type-all: 全部购买类型
     item-cart-type-permanent: 永久有效
@@ -115,6 +123,9 @@ mattoid-store:
     item-cart-outtime: 到期时间
     item-cart-auto-deduction: 自动续费
     item-cart-created: 购买时间
+    item-cart-orphaned: 插件已卸载
+    item-cart-yes: "是"
+    item-cart-no: "否"
 
     item-cart-button-use: 使用
     item-cart-button-cancel: 取消

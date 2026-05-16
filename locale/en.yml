@@ -8,6 +8,7 @@ mattoid-store:
       decorationStoreTimezone: time zone
       decorationStoreTimezone-requirement: Set the time zone. Default to "Asia/Shanghai"
       group-view: Allow user groups to access the store
+      group-moderate: Allow user groups to manage the store
       add-store-goods: Add goods
       goods-status: Status
       goods-title: Title
@@ -24,7 +25,7 @@ mattoid-store:
       goods-upload-button: Upload
       goods-hide: No authority to hide products for a limited time
       store-timezone: Time zone
-      store-timezone-requirement: 设置时区。默认为 "Asia/Shanghai"
+      store-timezone-requirement: Set the time zone. Default to "Asia/Shanghai"
       edit-store-goods: Edit Goods
       goods-repeat: Allow duplicate Goodss
       goods-edit: Edit
@@ -41,7 +42,9 @@ mattoid-store:
       validate-fail: Failed to Goods item
 
   forum:
-    tital: Store
+    title: Store
+    # tital 为历史拼写错误的兼容别名（V-14），新代码请使用 title
+    tital: => mattoid-store.forum.title
     button: Buy
     buy-goods: Goods goods：{title}
     buy-goods-fail: Product refund：{title}
@@ -56,10 +59,13 @@ mattoid-store:
       insufficient-inventory: Insufficient inventory
       user-balance-low: Insufficient user balance
       store-goods-non-existent: The product does not exist or has been delisted
-      validate-fail: Failed to Goods item
-      cannot-Goods-repeatedly: No duplicate Goodss allowed within the validity period
+      validate-fail: Failed to validate item
+      cannot-purchase-repeatedly: No duplicate purchases allowed within the validity period
+      # cannot-Goods-repeatedly 为历史拼写错误的兼容别名
+      cannot-Goods-repeatedly: => mattoid-store.forum.error.cannot-purchase-repeatedly
       buy-goods-fail: Goods failed [{title}]
       file-exist: file already exist
+      file-required: File is required
       automatic-renewal: Automatic renewal not enabled
       invalid-product: Invalid product
       automatic-renewal-fail: Automatic renewal failed [{message}]
@@ -67,6 +73,7 @@ mattoid-store:
       goods-invalid-event-fail: Goods failure event push failed [{message}]
       cart-no-use: This Goods does not have any functional use
       cart-use-fail: Goods usage failed
+      cart-not-found: Cart item not found
 
   lib:
     item-status-all: All product statuses
@@ -99,12 +106,26 @@ mattoid-store:
 
     item-cart-title: Goods Title
     item-cart-status: payment status
+    item-cart-status-all: All payment statuses
+    item-cart-status-0: Unpaid
+    item-cart-status-1: Paid
+    item-cart-status-2: Invalidated
+    item-cart-status-9: Timed out
     item-cart-price: Price
     item-cart-pay-amt: Payment amount
     item-cart-type: Goods Type
+    item-cart-type-all: All purchase types
+    item-cart-type-permanent: Permanent validity
+    item-cart-type-limit: Time limited validity
     item-cart-outtime: Expiration date
     item-cart-auto-deduction: Automatic renewal
+    item-cart-auto-deduction-all: All renewal types
+    item-cart-auto-deduction-0: No renewal
+    item-cart-auto-deduction-1: Auto renewal
     item-cart-created: Buying time
+    item-cart-orphaned: Plugin unloaded
+    item-cart-yes: "Yes"
+    item-cart-no: "No"
 
     item-cart-button-use: Enable
     item-cart-button-cancel: Cancel
