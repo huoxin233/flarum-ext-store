@@ -30,12 +30,10 @@ export default class CartItem extends Component<CartItemAttrs> {
     };
 
     const moneyName = (app.forum.attribute('antoinefr-money.moneyname') || '[money]') as string;
-    const price = (this.cartData.price || 0) > 0
-      ? moneyName.replace('[money]', String(this.cartData.price))
-      : app.translator.trans('mattoid-store.forum.free');
-    const payAmt = (this.cartData.payAmt || 0) > 0
-      ? moneyName.replace('[money]', String(this.cartData.payAmt))
-      : app.translator.trans('mattoid-store.forum.free');
+    const price =
+      (this.cartData.price || 0) > 0 ? moneyName.replace('[money]', String(this.cartData.price)) : app.translator.trans('mattoid-store.forum.free');
+    const payAmt =
+      (this.cartData.payAmt || 0) > 0 ? moneyName.replace('[money]', String(this.cartData.payAmt)) : app.translator.trans('mattoid-store.forum.free');
 
     const status = (this.cartData.status as StatusKey) || 0;
     const isLimit = this.cartData.type === 'limit';
@@ -51,15 +49,14 @@ export default class CartItem extends Component<CartItemAttrs> {
               <label className="Cart-Label">{app.translator.trans('mattoid-store.lib.item-cart-title')}: </label>{' '}
               <span className="color-green">{this.cartData.title}</span>
               {this.cartData.orphaned && (
-                <span className="color-red" style="margin-left:6px;">[
-                  {app.translator.trans('mattoid-store.lib.item-cart-orphaned')}
-                ]</span>
+                <span className="color-red" style="margin-left:6px;">
+                  [{app.translator.trans('mattoid-store.lib.item-cart-orphaned')}]
+                </span>
               )}
               &nbsp;|&nbsp;
               <label className="Cart-Label">{app.translator.trans('mattoid-store.lib.item-cart-pay-amt')}: </label>{' '}
               <span className="color-red">{payAmt}</span> &nbsp;|&nbsp;
-              <label className="Cart-Label">{app.translator.trans('mattoid-store.lib.item-cart-price')}: </label>{' '}
-              <span>{price}</span>
+              <label className="Cart-Label">{app.translator.trans('mattoid-store.lib.item-cart-price')}: </label> <span>{price}</span>
             </div>
             <div>
               <label className="Cart-Label">{app.translator.trans('mattoid-store.lib.item-cart-status')}: </label>
@@ -90,11 +87,7 @@ export default class CartItem extends Component<CartItemAttrs> {
                     loading: this.loading,
                     onclick: (e: Event) => this.onsubmit(e),
                   },
-                  app.translator.trans(
-                    !this.cartData.enable
-                      ? 'mattoid-store.lib.item-cart-button-use'
-                      : 'mattoid-store.lib.item-cart-button-cancel'
-                  )
+                  app.translator.trans(!this.cartData.enable ? 'mattoid-store.lib.item-cart-button-use' : 'mattoid-store.lib.item-cart-button-cancel')
                 )
               : ''}
           </div>

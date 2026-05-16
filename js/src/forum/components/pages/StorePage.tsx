@@ -1,22 +1,21 @@
-import IndexPage from "flarum/forum/components/IndexPage";
+import IndexPage from 'flarum/forum/components/IndexPage';
 import { IPageAttrs } from 'flarum/common/components/Page';
 import listItems from 'flarum/common/helpers/listItems';
 import Mithril from 'mithril';
-import Button from "flarum/common/components/Button";
-import Stream from "flarum/common/utils/Stream";
-import StoreItem from "../component/StoreItem";
+import Button from 'flarum/common/components/Button';
+import Stream from 'flarum/common/utils/Stream';
+import StoreItem from '../component/StoreItem';
 
 export interface IIndexPageAttrs extends IPageAttrs {}
 
 export default class StorePage<CustomAttrs extends IIndexPageAttrs = IIndexPageAttrs> extends IndexPage {
-
-  private storeList: any = []
-  private moreResults: boolean = false
+  private storeList: any = [];
+  private moreResults: boolean = false;
 
   oncreate(vnode: Mithril.VnodeDOM<CustomAttrs, this>) {
     super.oncreate(vnode);
 
-    app.setTitle(app.forum.attribute("storeName") || app.translator.trans('mattoid-store.forum.tital'));
+    app.setTitle(app.forum.attribute('storeName') || app.translator.trans('mattoid-store.forum.tital'));
     app.setTitleCount(0);
 
     this.status = Stream('1');
@@ -34,19 +33,16 @@ export default class StorePage<CustomAttrs extends IIndexPageAttrs = IIndexPageA
               <ul>{listItems(this.sidebarItems().toArray())}</ul>
             </nav>
             <div className="StorePage-results sideNavOffset">
-              <h2 class="BadgeOverviewTitle">{app.forum.attribute("storeName") || app.translator.trans('mattoid-store.forum.tital')}</h2>
+              <h2 class="BadgeOverviewTitle">{app.forum.attribute('storeName') || app.translator.trans('mattoid-store.forum.tital')}</h2>
               <div className="Store-Body">
-                {
-                  this.storeList.map((item) => {
-                    if (!item.attributes.hide || app.session.user.attribute('can'+item.attributes.code.slice(0, 1).toUpperCase()+item.attributes.code.slice(1)+'View')) {
-                      return (
-                        <div className="storeItemContainer">
-                          {StoreItem.component({ item })}
-                        </div>
-                      );
-                    }
-                  })
-                }
+                {this.storeList.map((item) => {
+                  if (
+                    !item.attributes.hide ||
+                    app.session.user.attribute('can' + item.attributes.code.slice(0, 1).toUpperCase() + item.attributes.code.slice(1) + 'View')
+                  ) {
+                    return <div className="storeItemContainer">{StoreItem.component({ item })}</div>;
+                  }
+                })}
               </div>
 
               {!this.loading && this.storeList.length === 0 && (
@@ -68,8 +64,12 @@ export default class StorePage<CustomAttrs extends IIndexPageAttrs = IIndexPageA
               {this.loading && (
                 <div class="DiscussionList">
                   <div class="DiscussionList-loadMore">
-                    <div aria-label="loading…" role="status" data-size="medium"
-                         class="LoadingIndicator-container LoadingIndicator-container--block LoadingIndicator-container--medium">
+                    <div
+                      aria-label="loading…"
+                      role="status"
+                      data-size="medium"
+                      class="LoadingIndicator-container LoadingIndicator-container--block LoadingIndicator-container--medium"
+                    >
                       <div aria-hidden="true" class="LoadingIndicator"></div>
                     </div>
                   </div>
@@ -79,7 +79,7 @@ export default class StorePage<CustomAttrs extends IIndexPageAttrs = IIndexPageA
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   hasMoreResults() {
@@ -104,12 +104,12 @@ export default class StorePage<CustomAttrs extends IIndexPageAttrs = IIndexPageA
     this.loading = true;
     const filters = {
       type: this.type(),
-      status: this.status()
+      status: this.status(),
     };
 
     return app.store
-      .find("/store/list", {
-        filter:filters,
+      .find('/store/list', {
+        filter: filters,
         page: {
           offset,
         },
@@ -117,5 +117,4 @@ export default class StorePage<CustomAttrs extends IIndexPageAttrs = IIndexPageA
       .catch(() => {})
       .then(this.parseResults.bind(this));
   }
-
 }

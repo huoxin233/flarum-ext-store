@@ -29,14 +29,15 @@ export default class StoreModal extends Modal {
               loading: this.loading,
             },
             app.translator.trans('mattoid-store.lib.confirm')
-          )}&nbsp;
+          )}
+          &nbsp;
           {Button.component(
             {
               className: 'Button storeButton--gray',
               loading: this.loading,
               onclick: () => {
                 this.hide();
-              }
+              },
             },
             app.translator.trans('mattoid-store.lib.cancel')
           )}
@@ -51,19 +52,22 @@ export default class StoreModal extends Modal {
     this.loading = true;
 
     const status = this.storeData.status;
-    this.storeData.status = Number(!this.storeData.status)
+    this.storeData.status = Number(!this.storeData.status);
 
     const method = this.type === 'delete' ? 'DELETE' : 'PUT';
-    app.request({
-      method: method,
-      url: app.forum.attribute('apiUrl') + '/store/goods',
-      body: this.storeData
-    }).then(
-      () => location.reload(),
-      (result) => {
-        this.loading = false;
-        this.storeData.status = status;
-        this.handleErrors(result);
-    });
+    app
+      .request({
+        method: method,
+        url: app.forum.attribute('apiUrl') + '/store/goods',
+        body: this.storeData,
+      })
+      .then(
+        () => location.reload(),
+        (result) => {
+          this.loading = false;
+          this.storeData.status = status;
+          this.handleErrors(result);
+        }
+      );
   }
 }
