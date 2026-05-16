@@ -177,6 +177,38 @@ class StoreExtend implements ExtenderInterface, LifecycleInterface
     }
 
     /**
+     * 安全读取 Goods 实例的属性（兼容 public/protected）
+     * Safely read Goods properties (works for both public and protected).
+     *
+     * @return array{name: string|null, popUp: array, className: string}
+     */
+    public static function readGoodsMeta(string $key): ?array
+    {
+        $goods = self::getStoreGoods($key);
+        if (! $goods) {
+            return null;
+        }
+
+        $reflection = new \ReflectionObject($goods);
+
+        $read = function (string $prop, $default) use ($goods, $reflection) {
+            if (! $reflection->hasProperty($prop)) {
+                return $default;
+            }
+            $p = $reflection->getProperty($prop);
+            $p->setAccessible(true);
+            $value = $p->getValue($goods);
+            return $value ?? $default;
+        };
+
+        return [
+            'name' => $read('name', $key),
+            'popUp' => $read('popUp', []),
+            'className' => $read('className', 'store-buy Modal--small'),
+        ];
+    }
+
+    /**
      * 获取购买前置校验实例
      * Get the Validate handler instance
      */

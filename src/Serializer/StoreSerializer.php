@@ -24,23 +24,11 @@ class StoreSerializer extends AbstractSerializer
         $orphaned = true;
 
         if ($data->code) {
-            $goods = StoreExtend::getStoreGoods($data->code);
-            if ($goods) {
+            $meta = StoreExtend::readGoodsMeta($data->code);
+            if ($meta) {
                 $orphaned = false;
-                $reflection = new \ReflectionObject($goods);
-                if ($reflection->hasProperty('popUp')) {
-                    $popProp = $reflection->getProperty('popUp');
-                    $popProp->setAccessible(true);
-                    $popUp = json_encode($popProp->getValue($goods) ?: []);
-                }
-                if ($reflection->hasProperty('className')) {
-                    $clsProp = $reflection->getProperty('className');
-                    $clsProp->setAccessible(true);
-                    $value = $clsProp->getValue($goods);
-                    if ($value) {
-                        $className = $value;
-                    }
-                }
+                $popUp = json_encode($meta['popUp'] ?: []);
+                $className = $meta['className'] ?: $className;
             }
         }
 

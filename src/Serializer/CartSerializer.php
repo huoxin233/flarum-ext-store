@@ -4,12 +4,10 @@ namespace Mattoid\Store\Serializer;
 
 use Flarum\Api\Serializer\AbstractSerializer;
 use Flarum\Locale\Translator;
-use Illuminate\Cache\RateLimiting\Limit;
-use Mattoid\Store\Enum\LimitUnitEnum;
+use Mattoid\Store\Extend\StoreExtend;
 
 class CartSerializer extends AbstractSerializer
 {
-
     protected $translator;
 
     public function __construct(Translator $translator)
@@ -17,7 +15,12 @@ class CartSerializer extends AbstractSerializer
         $this->translator = $translator;
     }
 
-    protected function getDefaultAttributes($data) {
+    protected function getDefaultAttributes($data)
+    {
+        // 商品类型已卸载时标记为 orphaned，前端可禁用按钮 / 标记 UI
+        // Mark as orphaned when the product type is no longer registered
+        $orphaned = $data->code ? ! StoreExtend::has($data->code) : true;
+
         return [
             'id' => $data->id,
             'storeId' => $data->store_id,
@@ -31,8 +34,9 @@ class CartSerializer extends AbstractSerializer
             'createdAt' => $data->created_at,
             'updatedAt' => $data->updated_at,
             'autoDeduction' => $data->auto_deduction,
-            'enableType' => $data->enableType,
-            'enable' => $data->enable
+            'enableType' => $data->enableType ?? 0,
+            'enable' => $data->enable,
+            'orphaned' => $orphaned,
         ];
     }
 }

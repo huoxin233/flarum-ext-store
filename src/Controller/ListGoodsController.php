@@ -53,20 +53,13 @@ class ListGoodsController extends AbstractListController
         // Aggregate product metadata from the runtime registry
         $all = collect(StoreExtend::codes())
             ->map(function (string $code) {
-                $goods = StoreExtend::getStoreGoods($code);
-                if (! $goods) {
+                $meta = StoreExtend::readGoodsMeta($code);
+                if (! $meta) {
                     return null;
                 }
-                // 通过反射读取受保护属性 name（保持基类兼容性）
-                // Read protected `name` via reflection (keeps the abstract base class compatible)
-                $reflection = new \ReflectionObject($goods);
-                $nameProp = $reflection->hasProperty('name') ? $reflection->getProperty('name') : null;
-                $nameProp && $nameProp->setAccessible(true);
-                $name = $nameProp ? $nameProp->getValue($goods) : $code;
-
                 return (object) [
                     'code' => $code,
-                    'name' => $name,
+                    'name' => $meta['name'] ?? $code,
                 ];
             })
             ->filter()
