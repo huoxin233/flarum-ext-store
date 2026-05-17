@@ -13,3 +13,6 @@ js/coverage-ts
 js/package-lock.json
 
 package-lock.json
+
+# 本地数据库备份（手工迁移前的 mysqldump）
+.backup/
