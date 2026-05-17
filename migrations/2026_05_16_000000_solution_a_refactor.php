@@ -53,7 +53,8 @@ return [
 
         // V-12: discount_price → decimal(10, 2)
         try {
-            $connection->statement('ALTER TABLE `store` MODIFY `discount_price` DECIMAL(10, 2) NOT NULL DEFAULT 0');
+            $prefix = $connection->getTablePrefix();
+            $connection->statement("ALTER TABLE `{$prefix}store` MODIFY `discount_price` DECIMAL(10, 2) NOT NULL DEFAULT 0");
         } catch (\Throwable $e) {
             // 非 MySQL / SQLite 等平台兜底（best-effort）
             // best-effort fallback for non-MySQL platforms (SQLite etc.)
@@ -84,7 +85,9 @@ return [
 
         // V-12 反向
         try {
-            $schema->getConnection()->statement('ALTER TABLE `store` MODIFY `discount_price` INT NOT NULL DEFAULT 0');
+            $connection = $schema->getConnection();
+            $prefix = $connection->getTablePrefix();
+            $connection->statement("ALTER TABLE `{$prefix}store` MODIFY `discount_price` INT NOT NULL DEFAULT 0");
         } catch (\Throwable $e) {}
 
         $schema->table('store', function (Blueprint $table) use ($schema) {
