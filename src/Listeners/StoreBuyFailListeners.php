@@ -2,7 +2,7 @@
 
 namespace Mattoid\Store\Listeners;
 
-use AntoineFr\Money\Service\BalanceManager;
+use Huoxin\MoneyWithHistory\Service\BalanceManager;
 use Flarum\Locale\Translator;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Flarum\User\User;

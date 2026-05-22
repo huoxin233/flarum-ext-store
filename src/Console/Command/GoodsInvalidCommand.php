@@ -2,7 +2,7 @@
 
 namespace Mattoid\Store\Console\Command;
 
-use AntoineFr\Money\Service\BalanceManager;
+use Huoxin\MoneyWithHistory\Service\BalanceManager;
 use Carbon\Carbon;
 use Flarum\Console\AbstractCommand;
 use Flarum\Foundation\ValidationException;
