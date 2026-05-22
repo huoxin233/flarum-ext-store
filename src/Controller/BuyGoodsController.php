@@ -161,7 +161,7 @@ class BuyGoodsController extends AbstractListController
                     $user,
                     -$price,
                     'STORE_BUY_GOODS',
-                    $this->translator->trans('mattoid-store.forum.buy-goods', ['title' => $store->title]),
+                    'mattoid-store.forum.money-history.buy-goods',
                     [
                         'item_title' => $store->title,
                     ],

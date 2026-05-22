@@ -165,7 +165,7 @@ class GoodsInvalidCommand extends AbstractCommand
                 $user,
                 -(float) $cart->price,
                 'STORE_AUTO_DEDUCTION',
-                $this->translator->trans('mattoid-store.forum.auto-deduction', ['title' => $store->title]),
+                'mattoid-store.forum.money-history.auto-deduction',
                 [
                     'item_title' => $store->title,
                 ],

@@ -46,14 +46,16 @@ mattoid-store:
     # tital 为历史拼写错误的兼容别名（V-14），新代码请使用 title
     tital: => mattoid-store.forum.title
     button: Buy
-    buy-goods: Goods goods：{title}
-    buy-goods-fail: Product refund：{title}
-    auto-deduction: Automatic deduction of fees for products：{title}
     infinite: Infinite
     free: Free
     days: day
     ckeck-goods-outtime: Check the expiration time of the product
     cart: cart
+
+    money-history:
+      auto-deduction: Automatic deduction of fees for products：{title}
+      buy-goods: Goods goods：{title}
+      buy-goods-fail: Product refund：{title}
 
     error:
       insufficient-inventory: Insufficient inventory
