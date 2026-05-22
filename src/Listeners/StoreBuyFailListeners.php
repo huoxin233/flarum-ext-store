@@ -9,7 +9,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Mattoid\Store\Event\StoreBuyFailEvent;
 use Mattoid\Store\Event\StoreCartEditEvent;
 use Mattoid\Store\Event\StoreStockSubEvent;
-use AntoineFr\Money\Service\BalanceManager;
+use Huoxin\MoneyWithHistory\Service\BalanceManager;
 
 /**
  * 购买失败处理逻辑
@@ -52,7 +52,7 @@ class StoreBuyFailListeners
             $user,
             $cart->pay_amt,
             'STORE_BUY_GOODS_FAIL',
-            $this->translator->trans("mattoid-store.forum.buy-goods-fail", ['title' => $store->title]),
+            'mattoid-store.forum.money-history.buy-goods-fail',
             [
                 'item_title' => $store->title,
             ],

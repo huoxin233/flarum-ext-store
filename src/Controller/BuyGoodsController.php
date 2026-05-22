@@ -24,7 +24,7 @@ use Illuminate\Contracts\Cache\Repository as CacheContract;
 use Mattoid\Store\Serializer\GoodsSerializer;
 use Psr\Http\Message\ServerRequestInterface;
 use Tobscure\JsonApi\Document;
-use AntoineFr\Money\Service\BalanceManager;
+use Huoxin\MoneyWithHistory\Service\BalanceManager;
 
 /**
  * 购买商品
@@ -119,7 +119,7 @@ class BuyGoodsController extends AbstractListController
             $user,
             -$price,
             'STORE_BUY_GOODS',
-            $this->translator->trans("mattoid-store.forum.buy-goods", ['title' => $store->title]),
+            'mattoid-store.forum.money-history.buy-goods',
             [
                 'item_title' => $store->title,
             ],

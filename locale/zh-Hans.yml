@@ -39,14 +39,16 @@ mattoid-store:
   forum:
     tital: 商店
     button: 购买
-    buy-goods: 购买商品：{title}
-    buy-goods-fail: 商品退款：{title}
-    auto-deduction: 商品自动扣费：{title}
     infinite: 无限
     free: 免费
     days: 天
     ckeck-goods-outtime: 检查商品失效时间
     cart: 购买记录
+
+    money-history:
+      auto-deduction: 商品自动扣费：{title}
+      buy-goods: 购买商品：{title}
+      buy-goods-fail: 商品退款：{title}
 
     error:
       insufficient-inventory: 库存不足

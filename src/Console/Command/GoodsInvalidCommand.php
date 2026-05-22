@@ -14,7 +14,7 @@ use Mattoid\Store\Event\StoreInvalidEvent;
 use Mattoid\Store\Extend\StoreExtend;
 use Mattoid\Store\Model\StoreCartModel;
 use Mattoid\Store\Model\StoreModel;
-use AntoineFr\Money\Service\BalanceManager;
+use Huoxin\MoneyWithHistory\Service\BalanceManager;
 
 /**
  * 处理失效商品通知逻辑
@@ -129,7 +129,7 @@ class GoodsInvalidCommand extends AbstractCommand
                 $user,
                 -$cart->price,
                 'STORE_AUTO_DEDUCTION',
-                $this->translator->trans("mattoid-store.forum.auto-deduction", ['title' => $store->title]),
+                'mattoid-store.forum.money-history.auto-deduction',
                 [
                     'item_title' => $store->title,
                 ],
