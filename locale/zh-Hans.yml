@@ -46,9 +46,9 @@ mattoid-store:
     cart: 购买记录
 
     money-history:
-      auto-deduction: 商品自动扣费：{title}
-      buy-goods: 购买商品：{title}
-      buy-goods-fail: 商品退款：{title}
+      auto-deduction: 商品自动扣费：{item_title}
+      buy-goods: 购买商品：{item_title}
+      buy-goods-fail: 商品退款：{item_title}
 
     error:
       insufficient-inventory: 库存不足
