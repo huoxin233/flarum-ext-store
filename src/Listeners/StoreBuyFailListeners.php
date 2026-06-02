@@ -2,7 +2,7 @@
 
 namespace Mattoid\Store\Listeners;
 
-use AntoineFr\Money\Service\BalanceManager;
+use Huoxin\MoneyWithHistory\Service\BalanceManager;
 use Flarum\Locale\Translator;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Flarum\User\User;
@@ -70,7 +70,7 @@ class StoreBuyFailListeners
                 $user,
                 (float) $cart->pay_amt,
                 'STORE_BUY_GOODS_FAIL',
-                $this->translator->trans('mattoid-store.forum.buy-goods-fail', ['title' => $store->title]),
+                'mattoid-store.forum.money-history.buy-goods-fail',
                 [
                     'item_title' => $store->title,
                 ],

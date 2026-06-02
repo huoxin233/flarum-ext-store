@@ -2,7 +2,7 @@
 
 namespace Mattoid\Store\Console\Command;
 
-use AntoineFr\Money\Service\BalanceManager;
+use Huoxin\MoneyWithHistory\Service\BalanceManager;
 use Carbon\Carbon;
 use Flarum\Console\AbstractCommand;
 use Flarum\Foundation\ValidationException;
@@ -165,7 +165,7 @@ class GoodsInvalidCommand extends AbstractCommand
                 $user,
                 -(float) $cart->price,
                 'STORE_AUTO_DEDUCTION',
-                $this->translator->trans('mattoid-store.forum.auto-deduction', ['title' => $store->title]),
+                'mattoid-store.forum.money-history.auto-deduction',
                 [
                     'item_title' => $store->title,
                 ],
