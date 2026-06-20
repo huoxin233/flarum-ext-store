@@ -19,7 +19,8 @@ export default class StoreItem extends Component<IStoreItemAttrs> {
 
   view() {
     const moneyName = String(app.forum.attribute('antoinefr-money.moneyname') || '[money]');
-    const price = this.storeData.price > 0 ? moneyName.replace('[money]', String(this.storeData.price)) : app.translator.trans('mattoid-store.forum.free');
+    const price =
+      this.storeData.price > 0 ? moneyName.replace('[money]', String(this.storeData.price)) : app.translator.trans('mattoid-store.forum.free');
     const discountPrice = moneyName.replace('[money]', String(this.storeData.discountPrice));
 
     return (
