@@ -17,6 +17,15 @@ use Illuminate\Support\Facades\Log;
  */
 class StoreMoneyManager
 {
+    /** 购买商品扣费 */
+    public const SOURCE_BUY_GOODS = 'STORE_BUY_GOODS';
+
+    /** 购买失败退款 */
+    public const SOURCE_BUY_GOODS_FAIL = 'STORE_BUY_GOODS_FAIL';
+
+    /** 限时商品自动续费扣费 */
+    public const SOURCE_AUTO_DEDUCTION = 'STORE_AUTO_DEDUCTION';
+
     /**
      * @var Dispatcher
      */
@@ -49,7 +58,7 @@ class StoreMoneyManager
      *
      * @param User $user 被扣款用户
      * @param float $price 扣款金额
-     * @param string $source 资金来源标识（如 STOREBUYGOODS）
+     * @param string $source 资金来源标识（如 STORE_BUY_GOODS）
      * @param string $sourceKey 流水文案翻译键（huoxin 体系下写入历史流水）
      * @param array $params 流水文案参数
      * @param string $legacyMessage 旧版资金事件的消息文案（仅回退模式使用）
@@ -91,7 +100,7 @@ class StoreMoneyManager
      *
      * @param User $user 收款用户
      * @param float $amount 退款金额
-     * @param string $source 资金来源标识（如 STOREBUYGOODSFAIL）
+     * @param string $source 资金来源标识（如 STORE_BUY_GOODS_FAIL）
      * @param string $sourceKey 流水文案翻译键
      * @param array $params 流水文案参数
      * @param string $legacyMessage 旧版资金事件的消息文案（仅回退模式使用）

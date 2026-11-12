@@ -140,7 +140,7 @@ class BuyGoodsController extends AbstractListController
         $paid = $this->money->pay(
             $actor,
             $price,
-            'STOREBUYGOODS',
+            StoreMoneyManager::SOURCE_BUY_GOODS,
             'mattoid-store.forum.money-history.buy-goods',
             ['title' => $store->title],
             $this->translator->trans('mattoid-store.forum.buy-goods', ['title' => $store->title]),

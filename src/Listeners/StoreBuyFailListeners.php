@@ -50,7 +50,7 @@ class StoreBuyFailListeners
             $this->money->refund(
                 $user,
                 $cart->pay_amt,
-                'STOREBUYGOODSFAIL',
+                StoreMoneyManager::SOURCE_BUY_GOODS_FAIL,
                 'mattoid-store.forum.money-history.buy-goods-fail',
                 ['title' => $store->title],
                 $this->translator->trans('mattoid-store.forum.buy-goods-fail', ['title' => $store->title])

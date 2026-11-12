@@ -138,7 +138,7 @@ class GoodsInvalidCommand extends AbstractCommand
             $paid = $this->money->pay(
                 $user,
                 $cart->pay_amt,
-                'AUTODEDUCTION',
+                StoreMoneyManager::SOURCE_AUTO_DEDUCTION,
                 'mattoid-store.forum.money-history.auto-deduction',
                 ['title' => $store->title],
                 $this->translator->trans('mattoid-store.forum.auto-deduction', ['title' => $store->title])
