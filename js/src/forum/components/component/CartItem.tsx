@@ -34,20 +34,20 @@ export default class CartItem extends Component<CartItemAttrs> {
     const payAmt =
       (this.cartData.payAmt || 0) > 0 ? formatMoney(this.cartData.payAmt) : app.translator.trans('mattoid-store.forum.free');
     return (
-      <div className="frame">
+      <div className="StoreCartItem frame">
         <div className="row margin-top-10">
           <div className="col-md-12">
             <div>
-              <label className="Cart-Label">{app.translator.trans('mattoid-store.lib.item-cart-title')}: </label>{' '}
+              <label className="StoreCartItem-label Cart-Label">{app.translator.trans('mattoid-store.lib.item-cart-title')}: </label>{' '}
               <span className="color-green">{this.cartData.title}</span> &nbsp;|&nbsp;
-              <label className="Cart-Label">{app.translator.trans('mattoid-store.lib.item-cart-pay-amt')}: </label>{' '}
+              <label className="StoreCartItem-label Cart-Label">{app.translator.trans('mattoid-store.lib.item-cart-pay-amt')}: </label>{' '}
               <span className="color-red">{payAmt}</span> &nbsp;|&nbsp;
-              <label className="Cart-Label">{app.translator.trans('mattoid-store.lib.item-cart-price')}: </label> <span className="">{price}</span>
+              <label className="StoreCartItem-label Cart-Label">{app.translator.trans('mattoid-store.lib.item-cart-price')}: </label> <span className="">{price}</span>
             </div>
             <div>
-              <label className="Cart-Label">{app.translator.trans('mattoid-store.lib.item-cart-status')}: </label>
+              <label className="StoreCartItem-label Cart-Label">{app.translator.trans('mattoid-store.lib.item-cart-status')}: </label>
               <span className={status.class}>{app.translator.trans(status.key)}</span> &nbsp;|&nbsp;
-              <label className="Cart-Label">{app.translator.trans('mattoid-store.lib.item-cart-type')}: </label>{' '}
+              <label className="StoreCartItem-label Cart-Label">{app.translator.trans('mattoid-store.lib.item-cart-type')}: </label>{' '}
               <span className="">
                 {app.translator.trans(
                   this.cartData.type == 'limit' ? 'mattoid-store.lib.item-cart-type-limit' : 'mattoid-store.lib.item-cart-type-permanent'
@@ -56,7 +56,7 @@ export default class CartItem extends Component<CartItemAttrs> {
               &nbsp;|&nbsp;
               {this.cartData.type == 'limit' ? (
                 <span>
-                  <label className="Cart-Label">{app.translator.trans('mattoid-store.lib.item-cart-outtime')}: </label>
+                  <label className="StoreCartItem-label Cart-Label">{app.translator.trans('mattoid-store.lib.item-cart-outtime')}: </label>
                   <span>{this.cartData.outtime}</span>
                 </span>
               ) : (
@@ -64,14 +64,14 @@ export default class CartItem extends Component<CartItemAttrs> {
               )}
             </div>
             <div>
-              <label className="Cart-Label">{app.translator.trans('mattoid-store.lib.item-cart-auto-deduction')}: </label>
+              <label className="StoreCartItem-label Cart-Label">{app.translator.trans('mattoid-store.lib.item-cart-auto-deduction')}: </label>
               <span className={this.cartData.autoDeduction == 0 ? 'color-red' : 'color-green'}>
                 {app.translator.trans(
                   this.cartData.autoDeduction == 0 ? 'mattoid-store.lib.item-cart-auto-deduction-0' : 'mattoid-store.lib.item-cart-auto-deduction-1'
                 )}
               </span>{' '}
               &nbsp;|&nbsp;
-              <label className="Cart-Label">{app.translator.trans('mattoid-store.lib.item-cart-created')}: </label>{' '}
+              <label className="StoreCartItem-label Cart-Label">{app.translator.trans('mattoid-store.lib.item-cart-created')}: </label>{' '}
               <span className="">{this.cartData.createdAt}</span>
             </div>
           </div>

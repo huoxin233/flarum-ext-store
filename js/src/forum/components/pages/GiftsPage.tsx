@@ -41,7 +41,7 @@ export default class GiftsPage extends UserPage {
 
   content(): Mithril.Children {
     return (
-      <div className="Post-body">
+      <div className="StoreUserPage-content StoreGiftsPage-content">
         <h2 class="BadgeOverviewTitle">{app.translator.trans('mattoid-store.forum.gifts')}</h2>
         <div className="Store-Body">
           <ul className="StoreRecordGrid">

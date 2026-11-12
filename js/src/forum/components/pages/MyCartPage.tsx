@@ -48,7 +48,7 @@ export default class MyCartPage extends UserPage {
 
   content(): Mithril.Children {
     return (
-      <div className="Post-body">
+      <div className="StoreUserPage-content StoreCartPage-content">
         <h2 class="BadgeOverviewTitle">{app.translator.trans('mattoid-store.forum.cart')}</h2>
         <div className="Store-FilterBar">
           <div className="Invite-Input">

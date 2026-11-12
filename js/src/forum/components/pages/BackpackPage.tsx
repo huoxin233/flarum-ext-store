@@ -38,7 +38,7 @@ export default class BackpackPage extends UserPage {
 
   content(): Mithril.Children {
     return (
-      <div className="Post-body">
+      <div className="StoreUserPage-content StoreBackpackPage-content">
         <h2 class="BadgeOverviewTitle">{app.translator.trans('mattoid-store.forum.backpack')}</h2>
         <div className="Store-Body Backpack-Body">
           {this.list.items.map((item: StoreApiResource) => {
