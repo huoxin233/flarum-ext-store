@@ -56,11 +56,19 @@ trait ResolvesTargetUser
             }
 
             // 校验目标用户是否存在，不存在直接 404，防止对幽灵用户执行空查询或传递给第三方插件
-            if (!User::query()->where('id', $targetId)->exists()) {
+            if (!$this->userExists($targetId)) {
                 throw new ModelNotFoundException();
             }
         }
 
         return $targetId;
+    }
+
+    /**
+     * 校验目标用户实体是否存在
+     */
+    protected function userExists(int $userId): bool
+    {
+        return User::query()->where('id', $userId)->exists();
     }
 }
