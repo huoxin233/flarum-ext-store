@@ -6,6 +6,7 @@ import StoreModal from './StoreModal';
 import StoreGoodsDetailModal from './StoreGoodsDetailModal';
 import GiftGoodsModal from './GiftGoodsModal';
 import { formatMoney } from '../../common/money';
+import GoodsIcon from '../../common/components/GoodsIcon';
 
 interface StoreListItemAttrs extends ComponentAttrs {
   item: StoreApiResource;
@@ -33,9 +34,6 @@ export default class StoreListItem extends Component<StoreListItemAttrs> {
     const icon = data.icon || data.pluginIcon;
     const extIcon = data.pluginExtIcon;
     const price = data.price > 0 ? formatMoney(data.price) : app.translator.trans('mattoid-store.lib.free');
-    const isVideo = icon && icon.slice(-5) === '.webm';
-    // CSS 类名 icon（如用户名颜色 decorationStoreColorText2）不能作为图片地址
-    const isClassIcon = icon && icon.indexOf('/') === -1 && icon.indexOf('.') === -1;
     const statusUp = Number(data.status) === 1;
 
     // 已软删商品（回收站视图）：只展示信息 + 恢复入口
@@ -72,30 +70,7 @@ export default class StoreListItem extends Component<StoreListItemAttrs> {
     return (
       <div id={'goods' + data.id} className="StoreAdminItem">
         <div className="StoreAdminItem-icon">
-          {icon ? (
-            isClassIcon ? (
-              <span className={'StoreIconClassPreview ' + icon}>{app.translator.trans('mattoid-store.lib.class-icon-preview')}</span>
-            ) : isVideo ? (
-              <video autoplay loop muted playsinline>
-                <source src={icon} type="video/webm" />
-              </video>
-            ) : (
-              <img src={icon} alt={data.title || ''} />
-            )
-          ) : extIcon ? (
-            <span
-              className="StoreAdminItem-extIcon"
-              style={{
-                backgroundColor: extIcon.backgroundColor,
-                color: extIcon.color,
-                backgroundImage: extIcon.backgroundImage,
-              }}
-            >
-              <i className={extIcon.name} />
-            </span>
-          ) : (
-            <i className="fas fa-box StoreAdminItem-iconPlaceholder" />
-          )}
+          <GoodsIcon icon={icon} extIcon={extIcon} title={data.title} />
         </div>
 
         <div className="StoreAdminItem-main">

@@ -3,6 +3,7 @@ import Component, { ComponentAttrs } from 'flarum/common/Component';
 import type Mithril from 'mithril';
 import StoreBox from '../modal/StoreBox';
 import { formatMoney } from '../../../common/money';
+import GoodsIcon from '../../../common/components/GoodsIcon';
 
 export interface IStoreItemAttrs extends ComponentAttrs {
   item: StoreApiResource;
@@ -38,7 +39,6 @@ export default class StoreItem extends Component<IStoreItemAttrs> {
 
     const price = this.storeData.price > 0 ? formatMoney(this.storeData.price) : app.translator.trans('mattoid-store.forum.free');
     const discountPrice = formatMoney(this.storeData.discountPrice);
-    const isVideo = this.storeData.icon && this.storeData.icon.slice(-5) === '.webm';
     const soldOut = this.storeData.stock != -99 && this.storeData.stock <= 0;
 
     return (
@@ -50,10 +50,7 @@ export default class StoreItem extends Component<IStoreItemAttrs> {
         {soldOut && <div className="StoreItem-soldOutBadge">{app.translator.trans('mattoid-store.forum.sold-out')}</div>}
         <div className="itemTitle">{this.storeData.title}</div>
         <div className="StoreItem-icon">
-          <img className="logo-img" src={this.storeData.icon} alt={this.storeData.title || ''} style={isVideo ? 'display: none' : ''} />
-          <video className="logo-video" autoplay loop muted playsinline style={isVideo ? '' : 'display: none'}>
-            <source src={this.storeData.icon} type="video/webm" />
-          </video>
+          <GoodsIcon icon={this.storeData.icon} extIcon={this.storeData.pluginExtIcon} title={this.storeData.title} />
         </div>
         <div className="StoreItem-descWrap" onmouseenter={() => this.onDescEnter()} onmouseleave={() => this.onDescLeave()}>
           <div className="StoreItem-desc">{this.storeData.desc}</div>

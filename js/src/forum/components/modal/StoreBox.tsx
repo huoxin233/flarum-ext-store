@@ -5,6 +5,7 @@ import Button from 'flarum/common/components/Button';
 import Switch from 'flarum/common/components/Switch';
 import Select from 'flarum/common/components/Select';
 import { formatMoney } from '../../../common/money';
+import GoodsIcon from '../../../common/components/GoodsIcon';
 
 export interface IStoreModalAttrs extends IInternalModalAttrs {
   storeData: StoreItemData;
@@ -65,21 +66,20 @@ export default class StoreBox extends Modal<IStoreModalAttrs> {
 
     const price = d.price > 0 ? formatMoney(d.price) : app.translator.trans('mattoid-store.forum.free');
     const discountPrice = formatMoney(d.discountPrice);
-    const isVideo = d.icon && d.icon.slice(-5) === '.webm';
     const stockText = d.stock == -99 ? app.translator.trans('mattoid-store.forum.infinite') : d.stock;
     const typeText =
       app.translator.trans('mattoid-store.lib.item-type-' + d.type) +
       (d.type === 'limit' ? ` (${d.outtime}${app.translator.trans('mattoid-store.forum.days')})` : '');
 
     return m('.StoreBox-summary', [
-      d.icon
-        ? m(
-            '.StoreBox-summaryIcon',
-            isVideo
-              ? m('video', { autoplay: true, loop: true, muted: true, playsinline: true }, m('source', { src: d.icon, type: 'video/webm' }))
-              : m('img', { src: d.icon })
-          )
-        : null,
+      m(
+        '.StoreBox-summaryIcon',
+        m(GoodsIcon, {
+          icon: d.icon,
+          extIcon: d.pluginExtIcon,
+          title: d.title,
+        })
+      ),
       m('.StoreBox-summaryInfo', [
         m('.StoreBox-priceGroup', [
           m('span.price', (d.discountPrice || 0) > 0 ? discountPrice : price),

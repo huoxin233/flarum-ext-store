@@ -54,7 +54,10 @@ mattoid-store:
       section-plugin: 插件扩展设置
       section-item: 道具设置
       section-icon: 图标
-      goods-icon-hint: 支持图片地址、视频地址或装饰样式类名（如用户名颜色样式类）
+      goods-icon-hint: 支持图片地址、视频地址、Font Awesome 图标（如 fas fa-gift #f59e0b）或装饰样式类名
+      goods-icon-fa-color: 图标颜色
+      goods-icon-fa-bg: 徽章背景
+      goods-icon-color-reset: 重置颜色
       goods-purchase-limit-enable: 开启限购
       goods-purchase-limit-count: 限购数量
       goods-purchase-limit-period: 限购周期（0:终身限购）

@@ -56,7 +56,10 @@ mattoid-store:
       section-plugin: Plugin Settings
       section-item: Item Settings
       section-icon: Icon
-      goods-icon-hint: Supports an image URL, video URL, or decoration style class (e.g. username color class)
+      goods-icon-hint: Supports an image URL, video URL, Font Awesome icon (e.g. fas fa-gift #f59e0b), or decoration style class
+      goods-icon-fa-color: Icon Color
+      goods-icon-fa-bg: Badge Background
+      goods-icon-color-reset: Reset Color
       goods-purchase-limit-enable: Enable purchase limit
       goods-purchase-limit-count: Limit per period
       goods-purchase-limit-period: 'Limit period (0: lifetime limit)'

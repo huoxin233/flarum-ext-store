@@ -2,6 +2,7 @@ import app from 'flarum/admin/app';
 import Modal, { IInternalModalAttrs } from 'flarum/common/components/Modal';
 import type Mithril from 'mithril';
 import Button from 'flarum/common/components/Button';
+import GoodsIcon from '../../common/components/GoodsIcon';
 
 export interface IStoreModalAttrs extends IInternalModalAttrs {
   title: string;
@@ -33,38 +34,16 @@ export default class StoreModal extends Modal<IStoreModalAttrs> {
     const isRestore = this.type === 'restore';
     const icon = this.storeData.icon || this.storeData.pluginIcon;
     const extIcon = this.storeData.pluginExtIcon;
-    const isVideo = icon && icon.slice(-5) === '.webm';
-    // CSS 类名 icon（如用户名颜色 decorationStoreColorText2）不能作为图片地址
-    const isClassIcon = icon && icon.indexOf('/') === -1 && icon.indexOf('.') === -1;
-
     return (
       <div className="Modal-body">
         <div className="StoreConfirmBody">
           <div className={'StoreConfirmIcon' + (isDelete ? ' StoreConfirmIcon--danger' : '')}>
-            {icon ? (
-              isClassIcon ? (
-                <span className={'StoreIconClassPreview ' + icon}>{app.translator.trans('mattoid-store.lib.class-icon-preview')}</span>
-              ) : isVideo ? (
-                <video autoplay loop muted playsinline>
-                  <source src={icon} type="video/webm" />
-                </video>
-              ) : (
-                <img src={icon} alt={this.storeData.title || ''} />
-              )
-            ) : extIcon && (extIcon.name || extIcon.backgroundImage) ? (
-              <span
-                className="StoreAdminItem-extIcon"
-                style={{
-                  backgroundColor: extIcon.backgroundColor,
-                  color: extIcon.color,
-                  backgroundImage: extIcon.backgroundImage,
-                }}
-              >
-                {extIcon.name ? <i className={extIcon.name} /> : ''}
-              </span>
-            ) : (
-              <i className={'fas ' + (isDelete ? 'fa-trash-alt' : isRestore ? 'fa-undo' : 'fa-exchange-alt')} />
-            )}
+            <GoodsIcon
+              icon={icon}
+              extIcon={extIcon}
+              title={this.storeData.title}
+              fallback={isDelete ? 'fas fa-trash-alt' : isRestore ? 'fas fa-undo' : 'fas fa-exchange-alt'}
+            />
           </div>
           <div className="StoreConfirmText">
             <div className="StoreConfirmTitle">{this.storeData.title}</div>

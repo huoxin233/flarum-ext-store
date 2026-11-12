@@ -8,6 +8,8 @@ import Select from 'flarum/common/components/Select';
 import extractText from 'flarum/common/utils/extractText';
 import LoadingBlock from './LoadingBlock';
 import PaginatedList from './PaginatedList';
+import GoodsIcon from '../../common/components/GoodsIcon';
+import { parseFontAwesomeIcon, buildFontAwesomeIconString, isFontAwesomeIcon } from '../../common/icon';
 
 export interface IStoreGoodsDetailModalAttrs extends IInternalModalAttrs {
   storeData?: StoreItemData;
@@ -153,6 +155,35 @@ export default class StoreGoodsDetailModal extends Modal<IStoreGoodsDetailModalA
     });
 
     this.defaultsAppliedFor = code;
+  }
+
+  getParsedFaIcon() {
+    const iconStr = this.params.icon ? this.params.icon() : '';
+    return parseFontAwesomeIcon(iconStr);
+  }
+
+  updateFaIconColor(newColor?: string) {
+    const parsed = this.getParsedFaIcon();
+    if (!parsed) return;
+    const baseName = parsed.rawName || parsed.name;
+    const updated = buildFontAwesomeIconString(baseName, newColor, parsed.backgroundColor);
+    if (typeof this.params.icon === 'function') {
+      this.params.icon(updated);
+    } else {
+      this.params.icon = Stream(updated);
+    }
+  }
+
+  updateFaIconBg(newBg?: string) {
+    const parsed = this.getParsedFaIcon();
+    if (!parsed) return;
+    const baseName = parsed.rawName || parsed.name;
+    const updated = buildFontAwesomeIconString(baseName, parsed.color, newBg);
+    if (typeof this.params.icon === 'function') {
+      this.params.icon(updated);
+    } else {
+      this.params.icon = Stream(updated);
+    }
   }
 
   className(): string {
@@ -460,31 +491,54 @@ export default class StoreGoodsDetailModal extends Modal<IStoreGoodsDetailModalA
                     </Button>
                   </div>
                 </div>
+                {(() => {
+                  const parsedFA = this.getParsedFaIcon();
+                  if (!parsedFA) return null;
+
+                  return (
+                    <div className="StoreAdminColorBar">
+                      <label className="StoreAdminColorItem">
+                        <span>{app.translator.trans('mattoid-store.admin.settings.goods-icon-fa-color')}</span>
+                        <input
+                          type="color"
+                          value={parsedFA.color || '#4d698e'}
+                          oninput={(e: Event) => this.updateFaIconColor((e.target as HTMLInputElement).value)}
+                        />
+                      </label>
+                      <label className="StoreAdminColorItem">
+                        <span>{app.translator.trans('mattoid-store.admin.settings.goods-icon-fa-bg')}</span>
+                        <input
+                          type="color"
+                          value={parsedFA.backgroundColor || '#ffffff'}
+                          oninput={(e: Event) => this.updateFaIconBg((e.target as HTMLInputElement).value)}
+                        />
+                      </label>
+                      {(parsedFA.color || parsedFA.backgroundColor) && (
+                        <Button
+                          className="Button Button--link Button--sm"
+                          onclick={() => {
+                            const parsed = this.getParsedFaIcon();
+                            if (parsed) {
+                              const baseName = parsed.rawName || parsed.name;
+                              if (typeof this.params.icon === 'function') {
+                                this.params.icon(baseName);
+                              } else {
+                                this.params.icon = Stream(baseName);
+                              }
+                            }
+                          }}
+                        >
+                          {app.translator.trans('mattoid-store.admin.settings.goods-icon-color-reset')}
+                        </Button>
+                      )}
+                    </div>
+                  );
+                })()}
                 <div className="helpText">{app.translator.trans('mattoid-store.admin.settings.goods-icon-hint')}</div>
               </div>
               <div className="StoreAdminField StoreAdminIconRow-preview" style={this.params.icon() ? '' : 'display: none'}>
                 <div className="StoreIconPreview">
-                  {this.isImageIcon(this.params.icon()) ? (
-                    <img
-                      src={this.params.icon()}
-                      alt=""
-                      style={this.params.icon() && this.params.icon().slice(-5) === '.webm' ? 'display: none' : ''}
-                    />
-                  ) : (
-                    <div className="StoreIconEffectPreview">
-                      <div className={this.params.icon()}>{app.translator.trans('mattoid-store.admin.settings.goods-icon-effect-preview')}</div>
-                      <span className="StoreIconEffectClassName">{this.params.icon()}</span>
-                    </div>
-                  )}
-                  <video
-                    autoplay
-                    loop
-                    muted
-                    playsinline
-                    style={this.params.icon() && this.params.icon().slice(-5) === '.webm' ? '' : 'display: none'}
-                  >
-                    <source src={this.params.icon()} type="video/webm" />
-                  </video>
+                  <GoodsIcon icon={this.params.icon()} isPreview={true} />
                 </div>
               </div>
             </div>
@@ -583,20 +637,6 @@ export default class StoreGoodsDetailModal extends Modal<IStoreGoodsDetailModalA
         })()}
       </div>
     );
-  }
-
-  /**
-   * icon 是否为图片/视频地址；CSS 类名（如用户名颜色 decorationStoreColorText2）
-   * 不含路径分隔符或扩展名，不能作为图片 src 渲染
-   */
-  isImageIcon(icon: string): boolean {
-    if (!icon) {
-      return false;
-    }
-    if (icon.indexOf('/') === -1 && icon.indexOf('.') === -1) {
-      return false;
-    }
-    return icon.slice(-5) !== '.webm';
   }
 
   closeIcon() {

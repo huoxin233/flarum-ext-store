@@ -3,6 +3,7 @@ import Component, { ComponentAttrs } from 'flarum/common/Component';
 import type Mithril from 'mithril';
 import Button from 'flarum/common/components/Button';
 import Alert from 'flarum/common/components/Alert';
+import GoodsIcon from '../../../common/components/GoodsIcon';
 
 /**
  * 背包条目（商店商品卡片风格）
@@ -68,19 +69,7 @@ export default class BackpackItem extends Component<BackpackItemAttrs> {
           </span>
         </div>
         <div className="StoreItem-icon">
-          {icon ? (
-            isVideo ? (
-              <video autoplay loop muted playsinline>
-                <source src={icon} type="video/webm" />
-              </video>
-            ) : (
-              <img src={icon} alt={item.title || ''} />
-            )
-          ) : (
-            <span className="BackpackItem-iconPlaceholder">
-              <i className="fas fa-box" />
-            </span>
-          )}
+          <GoodsIcon icon={icon} title={item.title} />
         </div>
         <div className="BackpackItem-info">
           {this.renderSourceDetail(item)}
