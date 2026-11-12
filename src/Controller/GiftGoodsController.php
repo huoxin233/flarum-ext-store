@@ -64,7 +64,7 @@ class GiftGoodsController implements RequestHandlerInterface
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $actor = RequestUtil::getActor($request);
-        $actor->assertPermission('mattoid-store.group-moderate');
+        $actor->assertCan('mattoid-store.group-moderate');
         $this->operator = $actor;
 
         $params = $request->getParsedBody();
