@@ -54,6 +54,7 @@ return [
         ->css(__DIR__.'/less/forum.less')
         ->route('/u/{username}/cart', 'mattoid-store.u.user.cart')
         ->route('/u/{username}/backpack', 'mattoid-store.u.user.backpack')
+        ->route('/u/{username}/gifts', 'mattoid-store.u.user.gifts')
         ->route('/store', 'mattoid-store.forum.title')
         ->content(function (Document $document) {
             $document->payload['notificationTypes']['storeGiftNotification'] = 'Store Gift Notification';

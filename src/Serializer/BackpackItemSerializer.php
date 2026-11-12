@@ -17,6 +17,7 @@ class BackpackItemSerializer extends AbstractSerializer
     protected function getDefaultAttributes($data)
     {
         $out = [
+            'userId' => (int) ($data->userId ?? 0),
             'source' => $data->source,
             'refId' => $data->refId,
             'title' => $data->title,

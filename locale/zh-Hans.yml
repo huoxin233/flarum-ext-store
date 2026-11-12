@@ -131,6 +131,7 @@ mattoid-store:
       goods-renewed: 你的道具"{title}"已自动续期，点击查看资金交易记录
 
     error:
+      permission-denied: 无权访问该用户的商店数据
       insufficient-inventory: 库存不足
       user-balance-low: 用户余额不足
       limit-outtime-required: 限时商品必须设置大于 0 的有效天数

@@ -5,9 +5,9 @@ namespace Mattoid\Store\Controller;
 use Flarum\Api\Controller\AbstractListController;
 use Flarum\Http\RequestUtil;
 use Flarum\Http\UrlGenerator;
-use Flarum\User\Exception\PermissionDeniedException;
 use Illuminate\Support\Arr;
 use Mattoid\Store\Controller\Concerns\PaginatesQueries;
+use Mattoid\Store\Controller\Concerns\ResolvesTargetUser;
 use Mattoid\Store\Model\StoreCartModel;
 use Mattoid\Store\Serializer\CartSerializer;
 use Psr\Http\Message\ServerRequestInterface;
@@ -16,6 +16,7 @@ use Tobscure\JsonApi\Document;
 class ListCartController extends AbstractListController
 {
     use PaginatesQueries;
+    use ResolvesTargetUser;
 
     protected $url;
 
@@ -29,17 +30,16 @@ class ListCartController extends AbstractListController
         $this->url = $url;
     }
 
-    protected function data(ServerRequestInterface $request, Document $document) {
+    protected function data(ServerRequestInterface $request, Document $document)
+    {
         $actor = RequestUtil::getActor($request);
-        $params = $request->getQueryParams();
-        $type = Arr::get($params, 'filter.type');
-        $status = Arr::get($params, 'filter.status');
-        $autoDeduction = Arr::get($params, 'filter.autoDeduction');
-        $filter = [];
+        $userId = $this->resolveTargetUserId($request, $actor);
 
-        if (!$actor->can('mattoid-store.group-view')) {
-            throw new PermissionDeniedException();
-        }
+        $filters = $this->extractFilter($request);
+        $type = Arr::get($filters, 'type');
+        $status = Arr::get($filters, 'status');
+        $autoDeduction = Arr::get($filters, 'autoDeduction');
+        $filter = [];
 
         if ($type) {
             $filter['type'] = $type;
@@ -52,7 +52,7 @@ class ListCartController extends AbstractListController
         }
 
         $list = StoreCartModel::query()
-            ->where('user_id', $actor->id)
+            ->where('user_id', $userId)
             ->where($filter)
             ->orderByDesc('created_at')
             ->orderByDesc('id');

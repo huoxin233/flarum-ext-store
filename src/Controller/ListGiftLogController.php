@@ -5,17 +5,19 @@ namespace Mattoid\Store\Controller;
 use Flarum\Api\Controller\AbstractListController;
 use Flarum\Http\RequestUtil;
 use Flarum\Http\UrlGenerator;
-use Flarum\User\Exception\PermissionDeniedException;
+use Mattoid\Store\Controller\Concerns\ResolvesTargetUser;
 use Mattoid\Store\Model\StoreGiftLogModel;
 use Mattoid\Store\Serializer\StoreGiftLogSerializer;
 use Psr\Http\Message\ServerRequestInterface;
 use Tobscure\JsonApi\Document;
 
 /**
- * 我的赠送记录（当前登录用户收到的赠送，分页）
+ * 赠送记录（获赠视角，分页）
  */
 class ListGiftLogController extends AbstractListController
 {
+    use ResolvesTargetUser;
+
     public $serializer = StoreGiftLogSerializer::class;
 
     /** 每页条数上限 */
@@ -31,16 +33,14 @@ class ListGiftLogController extends AbstractListController
     protected function data(ServerRequestInterface $request, Document $document)
     {
         $actor = RequestUtil::getActor($request);
-        if ($actor->isGuest()) {
-            throw new PermissionDeniedException();
-        }
+        $userId = $this->resolveTargetUserId($request, $actor);
 
         $params = $request->getQueryParams();
         $limit = min($this->extractLimit($request), self::MAX_LIMIT);
         $offset = $this->extractOffset($request);
 
         $query = StoreGiftLogModel::query()
-            ->where('user_id', $actor->id)
+            ->where('user_id', $userId)
             ->orderByDesc('id');
 
         $total = $query->count();

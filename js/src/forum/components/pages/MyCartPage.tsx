@@ -19,6 +19,7 @@ export default class MyCartPage extends UserPage {
     endpoint: '/store/cart/list',
     params: () => ({
       filter: {
+        user_id: this.user ? this.user.id() : undefined,
         type: this.type(),
         status: this.status(),
         autoDeduction: this.autoDeduction(),
@@ -26,12 +27,25 @@ export default class MyCartPage extends UserPage {
     }),
   });
 
+  isAllowed(): boolean {
+    const actor = app.session?.user;
+    if (!actor) return false;
+    if (!this.user) return true;
+    return this.user.id() === actor.id() || Boolean(actor.isAdmin?.() || actor.attribute('canStoreModerate'));
+  }
+
   oninit(vnode: Mithril.Vnode<any, this>) {
     super.oninit(vnode);
 
     this.loadUser(m.route.param('username'));
+  }
 
-    this.list.refresh();
+  show(user: any) {
+    super.show(user);
+
+    if (this.isAllowed()) {
+      this.list.refresh();
+    }
   }
 
   oncreate(vnode: Mithril.VnodeDOM<any, this>) {
@@ -47,6 +61,16 @@ export default class MyCartPage extends UserPage {
   }
 
   content(): Mithril.Children {
+    if (this.user && !this.isAllowed()) {
+      return (
+        <div className="StoreUserPage-content StoreCartPage-content">
+          <div style="font-size:1.4em;color: var(--muted-more-color);text-align: center;line-height: 100px;">
+            {app.translator.trans('mattoid-store.forum.error.permission-denied')}
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="StoreUserPage-content StoreCartPage-content">
         <h2 class="BadgeOverviewTitle">{app.translator.trans('mattoid-store.forum.cart')}</h2>

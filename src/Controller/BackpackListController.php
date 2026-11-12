@@ -5,7 +5,7 @@ namespace Mattoid\Store\Controller;
 use Flarum\Api\Controller\AbstractListController;
 use Flarum\Http\RequestUtil;
 use Flarum\Http\UrlGenerator;
-use Flarum\User\Exception\PermissionDeniedException;
+use Mattoid\Store\Controller\Concerns\ResolvesTargetUser;
 use Mattoid\Store\Extend\StoreExtend;
 use Mattoid\Store\Model\StoreCartModel;
 use Mattoid\Store\Model\StoreModel;
@@ -24,6 +24,8 @@ use Tobscure\JsonApi\Document;
  */
 class BackpackListController extends AbstractListController
 {
+    use ResolvesTargetUser;
+
     /**
      * {@inheritdoc}
      */
@@ -41,14 +43,11 @@ class BackpackListController extends AbstractListController
     protected function data(ServerRequestInterface $request, Document $document)
     {
         $actor = RequestUtil::getActor($request);
+        $userId = $this->resolveTargetUserId($request, $actor);
+
         $params = $request->getQueryParams();
         $limit = $this->extractLimit($request);
         $offset = $this->extractOffset($request);
-
-        if ($actor->isGuest() || !$actor->can('mattoid-store.group-view')) {
-            throw new PermissionDeniedException();
-        }
-        $userId = $actor->id;
 
         $items = [];
 
@@ -116,6 +115,7 @@ class BackpackListController extends AbstractListController
                 $item = new \stdClass();
                 $item->id = 'store-' . $cart->id;
                 $item->source = 'store';
+                $item->userId = (int) $cart->user_id;
                 $item->refId = $cart->id;
                 $item->code = $cart->code;
                 $item->storeId = $cart->store_id;

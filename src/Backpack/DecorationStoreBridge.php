@@ -44,6 +44,7 @@ class DecorationStoreBridge
             $item = new \stdClass();
             $item->id = 'decoration-' . $purchase->id;
             $item->source = 'decoration';
+            $item->userId = (int) $purchase->user_id;
             $item->refId = $purchase->id;
             $item->title = $deco ? $deco->item_title : '';
             $item->icon = $image;

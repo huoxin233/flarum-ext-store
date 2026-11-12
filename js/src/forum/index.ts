@@ -71,13 +71,21 @@ app.initializers.add('mattoid/store', () => {
   };
 
   extend(UserPage.prototype, 'navItems', function (this: UserPage, items: ItemList<Mithril.Children>) {
+    const actor = app.session?.user;
     const user = this.user;
-    // 购买记录与背包属于用户隐私：仅在自己主页显示入口
-    if (!app.session?.user || !user || user.id() !== app.session.user.id()) {
+    if (!actor || !user) {
       return;
     }
 
-    if (app.session.user.attribute('canStoreView')) {
+    const isSelf = user.id() === actor.id();
+    const canModerate = Boolean(actor.isAdmin?.() || actor.attribute('canStoreModerate'));
+
+    // 购买记录与背包属于用户隐私：普通用户仅可查看自己主页，管理员或有管理权限的用户可查看他人主页（只读）
+    if (!isSelf && !canModerate) {
+      return;
+    }
+
+    if (actor.attribute('canStoreView') || canModerate) {
       items.add(
         'myCartPage',
         LinkButton.component(

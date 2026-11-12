@@ -19,6 +19,7 @@ import Alert from 'flarum/common/components/Alert';
  */
 interface BackpackItemAttrs extends ComponentAttrs {
   item: StoreApiResource;
+  user?: any;
   onChanged?: () => void;
 }
 
@@ -27,6 +28,19 @@ export default class BackpackItem extends Component<BackpackItemAttrs> {
   /** 正在执行的操作（用于只在被点击的按钮上显示加载动画） */
   private loadingAction: 'use' | 'cancel' | 'decoration' | null = null;
 
+  isSelf(): boolean {
+    const actorId = app.session?.user ? String(app.session.user.id()) : null;
+    if (!actorId) return false;
+    if (this.attrs.user) {
+      return String(this.attrs.user.id()) === actorId;
+    }
+    const item = this.attrs.item?.attributes || {};
+    if (item.userId) {
+      return String(item.userId) === actorId;
+    }
+    return true;
+  }
+
   view(): Mithril.Children {
     // 每次渲染直接读 attrs，避免背包刷新后复用组件实例导致状态过期
     const item = this.attrs.item.attributes || {};
@@ -34,7 +48,7 @@ export default class BackpackItem extends Component<BackpackItemAttrs> {
     // 商品插件可整体替换背包条目（props: item / onChanged）
     const CustomItem = (app as any).storeRegistry?.backpackItem?.get(item.code);
     if (CustomItem) {
-      return <CustomItem item={item} onChanged={this.attrs.onChanged} />;
+      return <CustomItem item={item} user={this.attrs.user} isSelf={this.isSelf()} onChanged={this.attrs.onChanged} />;
     }
 
     const Panel = (app as any).storeRegistry?.backpackPanel?.get(item.code);
@@ -70,9 +84,9 @@ export default class BackpackItem extends Component<BackpackItemAttrs> {
         </div>
         <div className="BackpackItem-info">
           {this.renderSourceDetail(item)}
-          {Panel && <Panel item={item} />}
+          {Panel && <Panel item={item} user={this.attrs.user} isSelf={this.isSelf()} />}
         </div>
-        <div className="BackpackItem-actionsRow">{this.renderActions(item)}</div>
+        {this.isSelf() && <div className="BackpackItem-actionsRow">{this.renderActions(item)}</div>}
       </div>
     );
   }
@@ -112,6 +126,10 @@ export default class BackpackItem extends Component<BackpackItemAttrs> {
   }
 
   renderActions(item: any) {
+    if (!this.isSelf()) {
+      return null;
+    }
+
     if (item.source === 'store') {
       const label =
         item.useType === 'consumable'
@@ -190,6 +208,8 @@ export default class BackpackItem extends Component<BackpackItemAttrs> {
   }
 
   useStoreItem(item: any) {
+    if (!this.isSelf()) return;
+
     this.loading = true;
     this.loadingAction = 'use';
     m.redraw();
@@ -216,6 +236,8 @@ export default class BackpackItem extends Component<BackpackItemAttrs> {
   }
 
   cancelSubscribe(item: any) {
+    if (!this.isSelf()) return;
+
     this.loading = true;
     this.loadingAction = 'cancel';
     m.redraw();
@@ -246,6 +268,8 @@ export default class BackpackItem extends Component<BackpackItemAttrs> {
   }
 
   toggleDecoration(item: any, equip: boolean) {
+    if (!this.isSelf()) return;
+
     this.loading = true;
     this.loadingAction = 'decoration';
     m.redraw();

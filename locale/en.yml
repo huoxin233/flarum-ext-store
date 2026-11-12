@@ -133,6 +133,7 @@ mattoid-store:
       goods-renewed: 'Your goods "{title}" has been auto-renewed. View your money history'
 
     error:
+      permission-denied: You do not have permission to access this user's store data
       insufficient-inventory: Insufficient inventory
       user-balance-low: Insufficient user balance
       limit-outtime-required: 'Limited-time goods must have a validity period greater than 0 days'
