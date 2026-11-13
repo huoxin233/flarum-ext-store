@@ -2,6 +2,7 @@
 
 namespace Mattoid\Store\Model;
 
+use Carbon\Carbon;
 use Flarum\Database\AbstractModel;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -33,4 +34,41 @@ class StoreModel extends AbstractModel
         'price' => 'float',
         'discount_price' => 'float',
     ];
+
+    public function carts()
+    {
+        return $this->hasMany(StoreCartModel::class, 'store_id');
+    }
+
+    /**
+     * 累计销量：统计历史上所有购买/赠送成功的订单（已支付 1、已使用 3、已失效 9）
+     * 优先使用 withCount 聚合出的 sold_count 字段，单行查询时按需懒加载
+     */
+    public function getSoldCountAttribute(): int
+    {
+        if (array_key_exists('sold_count', $this->attributes)) {
+            return (int) $this->attributes['sold_count'];
+        }
+
+        return (int) $this->carts()->whereIn('status', [1, 3, 9])->count();
+    }
+
+    /**
+     * 当前在用/持有用户数：统计当前处于有效持有期内（status = 1 且未过期）的记录数
+     * 优先使用 withCount 聚合出的 active_count 字段，单行查询时按需懒加载
+     */
+    public function getActiveCountAttribute(): int
+    {
+        if (array_key_exists('active_count', $this->attributes)) {
+            return (int) $this->attributes['active_count'];
+        }
+
+        return (int) $this->carts()
+            ->where('status', 1)
+            ->where(function ($q) {
+                $q->where('type', 'permanent')
+                    ->orWhere('outtime', '>=', Carbon::now());
+            })
+            ->count();
+    }
 }

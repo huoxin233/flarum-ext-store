@@ -275,7 +275,67 @@ export default class StoreGoodsDetailModal extends Modal<IStoreGoodsDetailModalA
               <div className="StoreAdminField">
                 <label>{app.translator.trans('mattoid-store.admin.settings.goods-stock')}</label>
                 <input required class="FormControl" type="number" step="1" min="-99" bidi={this.params.stock} />
-                <div className="helpText">{app.translator.trans('mattoid-store.admin.settings.goods-stock-help')}</div>
+                <div className="StoreAdminStockHelper">
+                  {(() => {
+                    const soldCount = this.attrs.storeData ? Number(this.attrs.storeData.soldCount || 0) : 0;
+                    const activeCount = this.attrs.storeData ? Number(this.attrs.storeData.activeCount || 0) : 0;
+                    const stockVal = Number(this.params.stock());
+                    const isUnlimited = stockVal === -99;
+                    const calculatedTotal = isUnlimited
+                      ? app.translator.trans('mattoid-store.lib.infinite')
+                      : (stockVal + soldCount);
+
+                    return (
+                      <div className="StoreAdminStockInsight">
+                        <span>
+                          {app.translator.trans('mattoid-store.admin.settings.goods-active-count')}:{' '}
+                          <b>
+                            {app.translator.trans('mattoid-store.admin.settings.goods-active-count-unit', {
+                              count: activeCount,
+                            })}
+                          </b>
+                        </span>
+                        <span>
+                          {app.translator.trans('mattoid-store.admin.settings.goods-sold-count')}: <b>{soldCount}</b>
+                        </span>
+                        <span>
+                          {app.translator.trans('mattoid-store.admin.settings.goods-total-stock')}: <b>{calculatedTotal}</b>
+                        </span>
+                      </div>
+                    );
+                  })()}
+                  <div className="StoreAdminStockQuickButtons">
+                    {[10, 50, 100].map((addAmount) => (
+                      <Button
+                        className="Button Button--xs"
+                        onclick={() => {
+                          const current = Number(this.params.stock());
+                          const next = current === -99 ? addAmount : current + addAmount;
+                          if (typeof this.params.stock === 'function') {
+                            this.params.stock(next);
+                          } else {
+                            this.params.stock = Stream(next);
+                          }
+                        }}
+                      >
+                        +{addAmount}
+                      </Button>
+                    ))}
+                    <Button
+                      className="Button Button--xs"
+                      onclick={() => {
+                        if (typeof this.params.stock === 'function') {
+                          this.params.stock(-99);
+                        } else {
+                          this.params.stock = Stream(-99);
+                        }
+                      }}
+                    >
+                      {app.translator.trans('mattoid-store.admin.settings.goods-stock-set-unlimited')}
+                    </Button>
+                  </div>
+                  <div className="helpText">{app.translator.trans('mattoid-store.admin.settings.goods-stock-help')}</div>
+                </div>
               </div>
               <div className="StoreAdminField">
                 <label>{app.translator.trans('mattoid-store.admin.settings.goods-discount')}</label>

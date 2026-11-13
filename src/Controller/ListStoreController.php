@@ -2,6 +2,7 @@
 
 namespace Mattoid\Store\Controller;
 
+use Carbon\Carbon;
 use Flarum\Api\Controller\AbstractListController;
 use Flarum\Http\RequestUtil;
 use Flarum\Http\UrlGenerator;
@@ -81,6 +82,23 @@ class ListStoreController extends AbstractListController
         if ($keyword !== '') {
             $escaped = addcslashes($keyword, '%_');
             $query->where('title', 'like', '%' . $escaped . '%');
+        }
+
+        // 管理员视角预加载销量统计与当前在用人数（单页一次聚合，避免 N+1 查询）
+        if ($actor->can('mattoid-store.group-moderate')) {
+            $now = Carbon::now();
+            $query->withCount([
+                'carts as sold_count' => function ($q) {
+                    $q->whereIn('status', [1, 3, 9]);
+                },
+                'carts as active_count' => function ($q) use ($now) {
+                    $q->where('status', 1)
+                        ->where(function ($w) use ($now) {
+                            $w->where('type', 'permanent')
+                                ->orWhere('outtime', '>=', $now);
+                        });
+                },
+            ]);
         }
 
         $list = $query->orderByDesc('sort')->orderByDesc('id');

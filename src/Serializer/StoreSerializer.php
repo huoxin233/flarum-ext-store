@@ -7,6 +7,7 @@ use Flarum\Extension\ExtensionManager;
 use Flarum\Locale\Translator;
 use Mattoid\Store\Extend\StoreExtend;
 use Mattoid\Store\Enum\LimitUnitEnum;
+use Mattoid\Store\Model\StoreModel;
 use Mattoid\Store\Service\PricingService;
 use Mattoid\Store\Utils\ExtensionIconUtil;
 
@@ -28,7 +29,7 @@ class StoreSerializer extends AbstractSerializer
     protected function getDefaultAttributes($data) {
         $plugin = StoreExtend::getPlugins()[$data->code] ?? null;
         $extIcon = $plugin ? ExtensionIconUtil::resolve($plugin, $this->extensions) : null;
-        return [
+        $attributes = [
             'id' => $data->id,
             'code' => $data->code,
             'title' => $data->title,
@@ -65,6 +66,19 @@ class StoreSerializer extends AbstractSerializer
             // 回收站视图依赖此字段判行类型（软删行由 ListStoreController 的 trashed 筛选返回）
             'deletedAt' => $data->deleted_at,
         ];
+
+        // 仅管理权限暴露销量、当前在用人数与总投放量统计，前台普通买家不可见
+        $actor = $this->getActor();
+        if ($actor && $actor->can('mattoid-store.group-moderate')) {
+            $soldCount = (int) $data->sold_count;
+            $attributes['soldCount'] = $soldCount;
+            $attributes['activeCount'] = (int) $data->active_count;
+            $attributes['totalStock'] = $data->stock == StoreModel::STOCK_UNLIMITED
+                ? StoreModel::STOCK_UNLIMITED
+                : (int) $data->stock + $soldCount;
+        }
+
+        return $attributes;
     }
 
     private function effectiveDiscountPrice($store): float

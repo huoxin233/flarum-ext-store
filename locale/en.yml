@@ -18,6 +18,12 @@ mattoid-store:
       goods-price: Price
       goods-stock: Stock
       goods-stock-help: "0 means out of stock. Use -99 for unlimited stock."
+      goods-sold-count: Total Sales
+      goods-active-count: Active Users
+      goods-active-count-unit: "{count} users"
+      goods-total-stock: Total Issued
+      goods-stock-sold-out: Sold Out
+      goods-stock-set-unlimited: Set Unlimited
       goods-discount: Discount(%)
       goods-discount-limit: Discount limit
       goods-discount-limit-unit: Unit

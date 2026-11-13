@@ -46,6 +46,9 @@ declare global {
     };
     price: number;
     stock: number;
+    soldCount?: number;
+    activeCount?: number;
+    totalStock?: number;
     discount: number;
     discountLimit: number;
     discountLimitUnit: 'days' | 'hour' | 'minute' | 'second' | string;

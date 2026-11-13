@@ -275,6 +275,16 @@
   color: var(--text-color);
   font-weight: 600;
 }
+.StoreAdminItem-soldOutBadge {
+  margin-left: 4px;
+  display: inline-block;
+  padding: 0 5px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.12);
+  border-radius: 4px;
+}
 .StoreAdminItem-actions {
   display: flex;
   flex-direction: row;
@@ -728,6 +738,53 @@
     vertical-align: middle;
   }
 }
+
+/* 库存辅助与销量透视看板 */
+.StoreAdminStockHelper {
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.StoreAdminStockInsight {
+  font-size: 12px;
+  color: var(--muted-color);
+  background: var(--body-bg);
+  padding: 5px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--control-bg);
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+
+  b {
+    color: var(--text-color);
+  }
+}
+
+.StoreAdminStockQuickButtons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+
+  .Button {
+    padding: 1px 8px;
+    font-size: 11px;
+    height: 22px;
+    line-height: 20px;
+    background: var(--control-bg);
+    border: 1px solid transparent;
+
+    &:hover {
+      background: var(--primary-color);
+      color: #ffffff;
+    }
+  }
+}
+
 .StoreGoodsModal .StoreAdminInline .FormControl {
   flex: 1;
   min-width: 0;

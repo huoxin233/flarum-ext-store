@@ -88,7 +88,27 @@ export default class StoreListItem extends Component<StoreListItemAttrs> {
             <span>
               {app.translator.trans('mattoid-store.lib.item-stock')}:{' '}
               <b>{data.stock == -99 ? app.translator.trans('mattoid-store.lib.infinite') : data.stock}</b>
+              {data.stock == 0 && (
+                <span className="StoreAdminItem-soldOutBadge">
+                  {app.translator.trans('mattoid-store.admin.settings.goods-stock-sold-out')}
+                </span>
+              )}
             </span>
+            {data.activeCount !== undefined && (
+              <span>
+                {app.translator.trans('mattoid-store.admin.settings.goods-active-count')}:{' '}
+                <b>
+                  {app.translator.trans('mattoid-store.admin.settings.goods-active-count-unit', {
+                    count: data.activeCount,
+                  })}
+                </b>
+              </span>
+            )}
+            {data.soldCount !== undefined && (
+              <span>
+                {app.translator.trans('mattoid-store.admin.settings.goods-sold-count')}: <b>{data.soldCount}</b>
+              </span>
+            )}
             {Number(data.discount) > 0 && (
               <span>
                 {app.translator.trans('mattoid-store.lib.item-discount')}: <b>{data.discount}%</b>

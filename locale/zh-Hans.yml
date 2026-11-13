@@ -19,6 +19,12 @@ mattoid-store:
       goods-price: 价格
       goods-stock: 库存
       goods-stock-help: "0 表示无库存，-99 表示无限库存。"
+      goods-sold-count: 累计销量
+      goods-active-count: 当前在用
+      goods-active-count-unit: "{count} 人"
+      goods-total-stock: 总投放参考
+      goods-stock-sold-out: 已售罄
+      goods-stock-set-unlimited: 设为无限
       goods-discount: 折扣(%)
       goods-discount-limit: 折扣时限
       goods-discount-limit-unit: 单位
