@@ -72,13 +72,15 @@ export default class GoodsIcon extends Component<GoodsIconAttrs> {
           );
         }
       } else if (isVideoIcon(cleanIcon)) {
+        // @deprecated 保留 logo-video 类名以兼容历史扩展；建议统一迁移至 GoodsIcon 组件或 .GoodsIcon-video 类名
         content = (
-          <video className="GoodsIcon-video" autoplay loop muted playsinline>
+          <video className="GoodsIcon-video logo-video" autoplay loop muted playsinline>
             <source src={cleanIcon} type="video/webm" />
           </video>
         );
       } else if (isImageIcon(cleanIcon)) {
-        content = <img className="GoodsIcon-img" src={cleanIcon} alt={extractText(title) || ''} />;
+        // @deprecated 保留 logo-img 类名以兼容历史扩展；建议统一迁移至 GoodsIcon 组件或 .GoodsIcon-img 类名
+        content = <img className="GoodsIcon-img logo-img" src={cleanIcon} alt={extractText(title) || ''} />;
       } else {
         // CSS 样式类名（如装扮插件的用户名颜色样式名）
         content = (

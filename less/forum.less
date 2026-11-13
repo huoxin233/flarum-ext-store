@@ -180,9 +180,13 @@
   align-items: center;
   justify-content: center;
   position: relative;
+  overflow: hidden;
 
   &-img,
-  &-video {
+  &-video,
+  /* @deprecated 兼容历史旧插件自定义类名选择器 */
+  .logo-img,
+  .logo-video {
     max-width: 100%;
     max-height: 100%;
     width: auto;
@@ -267,6 +271,35 @@
   align-items: center;
   justify-content: center;
   margin: 12px 0;
+  overflow: hidden;
+
+  img,
+  video,
+  /* @deprecated 兼容历史未重构商品扩展插件（如 flarum-ext-store-invite）手写 .logo-img / .logo-video */
+  .logo-img,
+  .logo-video {
+    max-width: 105px;
+    max-height: 115px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 8px;
+  }
+}
+
+/**
+ * @deprecated 历史旧扩展兼容垫片
+ * 兜底兼容历史第三方商品扩展（如旧版邀请卡等）自定义模板中的 .logo-img / .logo-video 图标防溢出；
+ * 计划在未来主版本移除，第三方扩展应迁移至标准 <GoodsIcon /> 组件。
+ */
+.logo-img,
+.logo-video {
+  max-width: 105px;
+  max-height: 115px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 8px;
 }
 .StoreItem:hover .GoodsIcon-fa,
 .StoreItem:hover .GoodsIcon-badge {
@@ -381,6 +414,19 @@
     background: var(--body-bg);
     border-radius: 8px;
     overflow: hidden;
+
+    img,
+    video,
+    /* @deprecated 兼容历史扩展手写类名 */
+    .logo-img,
+    .logo-video {
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      border-radius: 8px;
+    }
   }
   .StoreBox-summaryInfo {
     min-width: 0;

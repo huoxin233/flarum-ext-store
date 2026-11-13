@@ -97,9 +97,13 @@
   align-items: center;
   justify-content: center;
   position: relative;
+  overflow: hidden;
 
   &-img,
-  &-video {
+  &-video,
+  /* @deprecated 兼容历史旧插件自定义类名选择器 */
+  .logo-img,
+  .logo-video {
     max-width: 100%;
     max-height: 100%;
     width: auto;
@@ -187,6 +191,18 @@
   background: var(--body-bg);
   border-radius: 8px;
   overflow: hidden;
+
+  img,
+  video,
+  /* @deprecated 兼容历史未重构商品扩展插件（如 flarum-ext-store-invite）手写 .logo-img / .logo-video */
+  .logo-img,
+  .logo-video {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+  }
 }
 .StoreAdminItem-iconPlaceholder {
   font-size: 26px;
