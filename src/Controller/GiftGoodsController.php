@@ -105,7 +105,7 @@ class GiftGoodsController implements RequestHandlerInterface
     }
 
     /**
-     * 指定用户赠送：整体一个事务，单件失败仅记录跳过（与全体模式语义一致）
+     * 指定用户赠送：每个受赠用户独立事务处理，单人失败独立回滚并记录跳过（与全体模式语义一致）
      */
     private function giftToUsers(StoreModel $store, array $userIds, int $amount, int $outtimeDays = -1): ResponseInterface
     {
@@ -117,37 +117,41 @@ class GiftGoodsController implements RequestHandlerInterface
             'other' => 0,
         ];
 
-        $this->connection->transaction(function () use ($store, $userIds, $amount, $outtimeDays, &$successUsers, &$successCount, &$failed) {
-            foreach ($userIds as $userId) {
-                $user = User::query()->where('id', $userId)->whereNull('suspended_until')->first();
-                if (!$user) {
-                    continue;
-                }
-                // 商品具有唯一性（不允许重复持有）且目标用户已拥有：记录后跳过该用户，继续其他人
-                if ($this->isUniqueGoods($store) && $this->hasOwnedGoods($store, $user)) {
-                    $failed['alreadyOwned']++;
-                    continue;
-                }
-                try {
-                    $lastCart = null;
+        foreach ($userIds as $userId) {
+            $user = User::query()->where('id', $userId)->whereNull('suspended_until')->first();
+            if (!$user) {
+                continue;
+            }
+            // 商品具有唯一性（不允许重复持有）且目标用户已拥有：记录后跳过该用户，继续其他人
+            if ($this->isUniqueGoods($store) && $this->hasOwnedGoods($store, $user)) {
+                $failed['alreadyOwned']++;
+                continue;
+            }
+            $userSuccess = 0;
+            $lastCart = null;
+            try {
+                $this->connection->transaction(function () use ($store, $user, $amount, $outtimeDays, &$userSuccess, &$lastCart) {
                     for ($i = 0; $i < $amount; $i++) {
                         $cart = $this->giftOnce($store, $user, $outtimeDays);
                         if ($cart) {
-                            $successCount++;
+                            $userSuccess++;
                             $lastCart = $cart;
                         }
                     }
-                    $successUsers++;
-                    if ($lastCart) {
-                        $this->notifyGift($user, $store, $lastCart);
-                    }
-                } catch (ValidationException $e) {
-                    $this->classifyValidationFailure($e, $failed);
-                } catch (\Throwable $e) {
-                    $failed['other']++;
+                });
+            } catch (ValidationException $e) {
+                $this->classifyValidationFailure($e, $failed);
+            } catch (\Throwable $e) {
+                $failed['other']++;
+            }
+            if ($userSuccess > 0) {
+                $successUsers++;
+                $successCount += $userSuccess;
+                if ($lastCart) {
+                    $this->notifyGift($user, $store, $lastCart);
                 }
             }
-        });
+        }
 
         return new JsonResponse([
             'successUsers' => $successUsers,
