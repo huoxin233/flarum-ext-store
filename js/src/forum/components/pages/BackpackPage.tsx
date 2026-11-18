@@ -78,31 +78,31 @@ export default class BackpackPage extends UserPage {
               </div>
             );
           })}
-
-          {!this.list.loading && this.list.items.length === 0 && (
-            <div>
-              <div style="font-size:1.4em;color: var(--muted-more-color);text-align: center;line-height: 100px;">
-                {app.translator.trans('mattoid-store.lib.backpack-empty')}
-              </div>
-            </div>
-          )}
-
-          {/* 「加载更多」按钮与手机端瀑布流（滚动到底自动加载，见 oncreate）并存 */}
-          {this.list.hasMore() && (
-            <div style="text-align:center;padding:20px">
-              <Button
-                className={'Button Button--primary'}
-                disabled={this.list.loading}
-                loading={this.list.loading}
-                onclick={() => this.list.loadMore()}
-              >
-                {app.translator.trans('mattoid-store.lib.list-load-more')}
-              </Button>
-            </div>
-          )}
-
-          {this.list.loading && <LoadingBlock />}
         </div>
+
+        {!this.list.loading && this.list.items.length === 0 && (
+          <div>
+            <div style="font-size:1.4em;color: var(--muted-more-color);text-align: center;line-height: 100px;">
+              {app.translator.trans('mattoid-store.lib.backpack-empty')}
+            </div>
+          </div>
+        )}
+
+        {/* 「加载更多」按钮与手机端瀑布流（滚动到底自动加载，见 oncreate）并存 */}
+        {this.list.hasMore() && (
+          <div style="text-align:center;padding:20px">
+            <Button
+              className={'Button Button--primary'}
+              disabled={this.list.loading}
+              loading={this.list.loading}
+              onclick={() => this.list.loadMore()}
+            >
+              {app.translator.trans('mattoid-store.lib.list-load-more')}
+            </Button>
+          </div>
+        )}
+
+        {this.list.loading && <LoadingBlock />}
       </div>
     );
   }

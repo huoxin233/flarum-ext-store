@@ -71,8 +71,7 @@ export default class GiftsPage extends UserPage {
     return (
       <div className="StoreUserPage-content StoreGiftsPage-content">
         <h2 class="BadgeOverviewTitle">{app.translator.trans('mattoid-store.forum.gifts')}</h2>
-        <div className="Store-Body">
-          <ul className="StoreRecordGrid">
+        <ul className="StoreRecordGrid">
           {this.list.items.map((item: StoreApiResource) => {
             const a = item.attributes || {};
             const from = a.fromUser || {};
@@ -102,31 +101,30 @@ export default class GiftsPage extends UserPage {
               </li>
             );
           })}
-          </ul>
+        </ul>
 
-          {!this.list.loading && this.list.items.length === 0 && (
-            <div>
-              <div style="font-size:1.4em;color: var(--muted-more-color);text-align: center;line-height: 100px;">
-                {app.translator.trans('mattoid-store.forum.gifts-empty')}
-              </div>
+        {!this.list.loading && this.list.items.length === 0 && (
+          <div>
+            <div style="font-size:1.4em;color: var(--muted-more-color);text-align: center;line-height: 100px;">
+              {app.translator.trans('mattoid-store.forum.gifts-empty')}
             </div>
-          )}
+          </div>
+        )}
 
-          {this.list.hasMore() && (
-            <div style="text-align:center;padding:20px">
-              <Button
-                className={'Button Button--primary'}
-                disabled={this.list.loading}
-                loading={this.list.loading}
-                onclick={() => this.list.loadMore()}
-              >
-                {app.translator.trans('mattoid-store.lib.list-load-more')}
-              </Button>
-            </div>
-          )}
+        {this.list.hasMore() && (
+          <div style="text-align:center;padding:20px">
+            <Button
+              className={'Button Button--primary'}
+              disabled={this.list.loading}
+              loading={this.list.loading}
+              onclick={() => this.list.loadMore()}
+            >
+              {app.translator.trans('mattoid-store.lib.list-load-more')}
+            </Button>
+          </div>
+        )}
 
-          {this.list.loading && <LoadingBlock />}
-        </div>
+        {this.list.loading && <LoadingBlock />}
       </div>
     );
   }

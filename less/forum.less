@@ -88,19 +88,29 @@
 }
 
 /* 商品卡片网格 */
+.StoreUserPage-content,
+.StorePage-results {
+  min-width: 0;
+  max-width: 100%;
+}
+
 .Store-Body {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
   padding: 4px 0 16px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .storeItemContainer {
   position: relative;
-  width: 250px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   height: 330px;
-  border: none;
   padding: 16px;
   cursor: pointer;
   border-radius: 12px;
@@ -115,19 +125,51 @@
   -ms-user-select: none;
   user-select: none;
   margin: 0;
-  display: inline-block;
+  display: block;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 .storeItemContainer:hover {
   transform: translateY(-3px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.14);
 }
-@media (max-width: 576px) {
+@media @tablet {
+  .Store-Body {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media @phone {
+  .Store-Body {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
   .storeItemContainer {
-    width: 100%;
-    max-width: 320px;
     height: auto;
-    min-height: 300px;
+    min-height: 230px;
+    padding: 12px;
+  }
+  .itemTitle {
+    font-size: 14px;
+    height: 40px;
+  }
+  .StoreItem-icon {
+    height: 84px;
+    margin: 6px 0;
+  }
+  .StoreItem-footer {
+    gap: 4px;
+    padding-top: 8px;
+  }
+  .price {
+    font-size: 15px;
+  }
+  .StoreItem-stock,
+  .StoreItem-type {
+    font-size: 11px;
+  }
+}
+@media (max-width: 359px) {
+  .Store-Body {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -266,6 +308,8 @@
 
 .StoreItem-icon {
   height: 115px;
+  min-width: 0;
+  max-width: 100%;
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -502,9 +546,9 @@
 
 /* ============ 记录卡片（赠送记录 / 开启记录）：网格卡片，每行最多 3 个 ============ */
 .StoreRecordGrid {
-  // 父容器 .Store-Body 是 flex 布局，网格必须显式占满整行，
-  // 否则 flex item 宽度按内容收缩，网格退化为单列
+  // 兜底：若外层仍包裹在 .Store-Body（flex/grid）内，确保占据整行
   flex: 1 1 100%;
+  grid-column: 1 / -1;
   width: 100%;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -626,6 +670,8 @@
   display: flex;
   flex-direction: column;
   height: 100%;
+  min-width: 0;
+  max-width: 100%;
   cursor: default;
 }
 .BackpackItem .itemTitle {
@@ -638,6 +684,9 @@
   color: var(--muted-color);
   line-height: 1.5;
   min-height: 20px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 .BackpackItem-info .color-green {
   color: var(--alert-success-color, #7bc17c);
@@ -712,20 +761,29 @@
 
 /* 背包卡片：个人中心内容区较窄，用更紧凑的尺寸让一行能放更多商品 */
 .backpackItemContainer {
-  width: 200px;
+  width: 100%;
   height: 290px;
   padding: 12px;
 }
-@media (max-width: 576px) {
-  .backpackItemContainer {
-    width: 46%;
-    max-width: none;
-    height: auto;
-    min-height: 260px;
-  }
-}
 .Backpack-Body {
   gap: 12px;
+}
+@media @phone {
+  .Backpack-Body {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .backpackItemContainer {
+    height: auto;
+    min-height: 230px;
+  }
+  .BackpackItem .StoreItem-icon {
+    height: 76px;
+    margin: 6px 0;
+  }
+  .BackpackItem-info {
+    font-size: 11px;
+  }
 }
 .BackpackItem .StoreItem-icon {
   height: 100px;

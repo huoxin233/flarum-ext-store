@@ -77,7 +77,6 @@ export default class MyCartPage extends UserPage {
         <div className="Store-FilterBar">
           <div className="Invite-Input">
             <Select
-              style="width: 150px"
               value={this.status()}
               disabled={this.list.loading}
               options={{
@@ -96,7 +95,6 @@ export default class MyCartPage extends UserPage {
           </div>
           <div className="Invite-Input">
             <Select
-              style="width: 150px"
               value={this.type()}
               disabled={this.list.loading}
               options={{
@@ -112,7 +110,6 @@ export default class MyCartPage extends UserPage {
           </div>
           <div className="Invite-Input">
             <Select
-              style="width: 150px"
               value={this.autoDeduction()}
               disabled={this.list.loading}
               options={{
