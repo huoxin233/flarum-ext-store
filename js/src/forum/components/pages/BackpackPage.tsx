@@ -11,6 +11,8 @@ import bindInfiniteScroll from '../../utils/bindInfiniteScroll';
 export default class BackpackPage extends UserPage {
   private list: PaginatedList<StoreApiResource> = new PaginatedList({
     endpoint: '/store/backpack/list',
+    // 24 可同时被 1/2/3/4 整除，与背包多列网格对齐
+    limit: 24,
     params: () => ({
       filter: {
         user_id: this.user ? this.user.id() : undefined,

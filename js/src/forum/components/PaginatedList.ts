@@ -3,6 +3,8 @@ import app from 'flarum/forum/app';
 export interface IPaginatedListOptions {
   /** 请求路径，如 /store/list */
   endpoint: string;
+  /** 每页条数（可选，未传时由后端默认分页大小决定） */
+  limit?: number;
   /** 构造额外请求参数（filter 等），每次请求时调用 */
   params?: () => Record<string, any>;
   /** 首页（offset=0）加载失败时清空已展示条目（默认保留旧列表） */
@@ -42,7 +44,11 @@ export default class PaginatedList<T = any> {
   private load(offset: number): Promise<any> {
     this.loading = true;
     const seq = ++this.requestSeq;
-    const query: Record<string, any> = { page: { offset } };
+    const page: Record<string, any> = { offset };
+    if (this.options.limit && this.options.limit > 0) {
+      page.limit = this.options.limit;
+    }
+    const query: Record<string, any> = { page };
     if (this.options.params) {
       Object.assign(query, this.options.params());
     }

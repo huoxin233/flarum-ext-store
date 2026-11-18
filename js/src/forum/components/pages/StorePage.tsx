@@ -19,6 +19,8 @@ const FILTER_KEYS = ['code', 'group', 'subtype', 'type', 'discount'];
 export default class StorePage<CustomAttrs extends IIndexPageAttrs = IIndexPageAttrs> extends IndexPage {
   private list: PaginatedList<StoreApiResource> = new PaginatedList({
     endpoint: '/store/list',
+    // 24 可同时被 1/2/3/4 整除，避免桌面 3 列或平板 2 列展示时每页末尾缺格
+    limit: 24,
     params: () => ({
       filter: Object.assign(
         {
