@@ -4,6 +4,7 @@ import type Mithril from 'mithril';
 import Button from 'flarum/common/components/Button';
 import Alert from 'flarum/common/components/Alert';
 import GoodsIcon from '../../../common/components/GoodsIcon';
+import BackpackConfirmModal from '../modal/BackpackConfirmModal';
 
 /**
  * 背包条目（商店商品卡片风格）
@@ -199,11 +200,26 @@ export default class BackpackItem extends Component<BackpackItemAttrs> {
   useStoreItem(item: any) {
     if (!this.isSelf()) return;
 
+    const isCancelUse = item.useType !== 'consumable' && !!item.enable;
+    const titleKey = isCancelUse ? 'mattoid-store.lib.backpack-cancel-use' : 'mattoid-store.lib.backpack-use';
+    const messageKey = isCancelUse ? 'mattoid-store.lib.backpack-cancel-use-confirm' : 'mattoid-store.lib.backpack-use-confirm';
+
+    app.modal.show(BackpackConfirmModal, {
+      title: app.translator.trans(titleKey),
+      itemTitle: item.title,
+      message: app.translator.trans(messageKey),
+      icon: item.icon,
+      danger: false,
+      onConfirm: () => this.doUseStoreItem(item),
+    });
+  }
+
+  private doUseStoreItem(item: any): Promise<any> {
     this.loading = true;
     this.loadingAction = 'use';
     m.redraw();
 
-    app
+    return app
       .request({
         method: 'POST',
         url: app.forum.attribute('apiUrl') + '/store/backpack/use',
@@ -227,11 +243,22 @@ export default class BackpackItem extends Component<BackpackItemAttrs> {
   cancelSubscribe(item: any) {
     if (!this.isSelf()) return;
 
+    app.modal.show(BackpackConfirmModal, {
+      title: app.translator.trans('mattoid-store.lib.backpack-cancel-subscribe'),
+      itemTitle: item.title,
+      message: app.translator.trans('mattoid-store.lib.backpack-cancel-subscribe-confirm'),
+      icon: item.icon,
+      danger: true,
+      onConfirm: () => this.doCancelSubscribe(item),
+    });
+  }
+
+  private doCancelSubscribe(item: any): Promise<any> {
     this.loading = true;
     this.loadingAction = 'cancel';
     m.redraw();
 
-    app
+    return app
       .request({
         method: 'POST',
         url: app.forum.attribute('apiUrl') + '/store/backpack/cancel-subscribe',

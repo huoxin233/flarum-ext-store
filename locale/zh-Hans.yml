@@ -232,12 +232,15 @@ mattoid-store:
     item-use-type-consumable: 一次性道具
     item-use-type-limit: 限时道具
     backpack-use: 使用
+    backpack-use-confirm: 确定要使用该道具吗？
     backpack-cancel-use: 取消使用
+    backpack-cancel-use-confirm: 确定要取消使用该道具吗？
     backpack-remaining: 剩余 {count} 件
     backpack-equip: 佩戴
     backpack-unequip: 卸下
     backpack-in-use: 使用中
     backpack-cancel-subscribe: 取消订阅
+    backpack-cancel-subscribe-confirm: 取消订阅后，商品到期将不再自动续费，且无法在背包中重新开启订阅，确定要取消吗？
     backpack-cancel-subscribe-success: 已取消订阅「{title}」，到期后将自动失效并从背包中移除
     backpack-empty: 背包空空如也
     backpack-use-fail: 操作失败，请稍后重试

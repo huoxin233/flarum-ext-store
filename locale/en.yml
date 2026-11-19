@@ -230,12 +230,15 @@ mattoid-store:
     item-use-type-consumable: Consumable item
     item-use-type-limit: Time-limited item
     backpack-use: Use
+    backpack-use-confirm: Are you sure you want to use this item?
     backpack-cancel-use: Cancel use
+    backpack-cancel-use-confirm: Are you sure you want to stop using this item?
     backpack-remaining: "{count} remaining"
     backpack-equip: Equip
     backpack-unequip: Unequip
     backpack-in-use: In use
     backpack-cancel-subscribe: Cancel subscription
+    backpack-cancel-subscribe-confirm: After canceling, this item will not auto-renew upon expiration and auto-renewal cannot be re-enabled from your backpack. Are you sure?
     backpack-cancel-subscribe-success: 'Subscription of "{title}" canceled. It will expire and be removed from your backpack when due.'
     backpack-empty: Your backpack is empty
     backpack-use-fail: Operation failed, please try again later
